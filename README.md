@@ -57,3 +57,5 @@ To ensure this extension remains robust and allows for safe, instant toggling be
    - When active, CSS hides legacy elements and displays the injected UI.
    - **Crucially**, we use CSS Flexbox `order` (e.g., `order: -1`) to reposition panels and sort lists instead of physically moving DOM nodes in JavaScript.
    - When the toggle is disabled, the root class is removed, all CSS rules vanish, and the portal instantly snaps back to its original layout with zero JavaScript revert logic required.
+4. **Minimize JavaScript Bloat**: Prioritize CSS for layout and styling changes. Use JavaScript only when absolutely necessary (e.g., for complex DOM injection or state logic that CSS cannot handle). This keeps the extension lightweight and ensures high performance.
+

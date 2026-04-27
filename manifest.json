@@ -13,7 +13,9 @@
         "css/layout.css",
         "css/header.css",
         "css/navigation.css",
-        "css/courses.css"
+        "css/courses.css",
+        "css/news.css",
+        "css/login.css"
       ],
       "js": ["content.js"],
       "run_at": "document_start"

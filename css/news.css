@@ -1,0 +1,108 @@
+/* ==========================================================================
+   News Module
+   ==========================================================================
+   Cleans up the right-column Latest News block so each post reads like a
+   structured item with clearer separation between date, lecturer, and text.
+   ========================================================================== */
+
+html.portal-cleaner-active #right-column {
+  width: 240px !important;
+}
+
+html.portal-cleaner-active .block_news_items.sideblock {
+  margin: 0 !important;
+}
+
+html.portal-cleaner-active .block_news_items .content {
+  padding: 0.5rem !important;
+}
+
+html.portal-cleaner-active .block_news_items .unlist {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+html.portal-cleaner-active .block_news_items li.post {
+  margin: 0 0 0.75rem !important;
+  padding: 0.65rem 0.75rem !important;
+  border: 1px solid var(--pc-line) !important;
+  border-radius: 10px !important;
+  background: var(--pc-surface) !important;
+  box-shadow: var(--pc-shadow) !important;
+  cursor: pointer !important;
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease !important;
+}
+
+html.portal-cleaner-active .block_news_items li.post:last-child {
+  margin-bottom: 0 !important;
+}
+
+html.portal-cleaner-active .block_news_items li.post:hover,
+html.portal-cleaner-active .block_news_items li.post:focus-visible {
+  border-color: var(--pc-primary) !important;
+  background: var(--pc-primary-soft) !important;
+  box-shadow: 0 10px 20px -14px rgba(37, 99, 235, 0.55) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+
+html.portal-cleaner-active .block_news_items .head {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.1rem !important;
+  margin: 0 0 0.45rem !important;
+}
+
+html.portal-cleaner-active .block_news_items .date {
+  margin: 0 !important;
+  color: var(--pc-muted) !important;
+  font-size: 0.75rem !important;
+  font-style: normal !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+html.portal-cleaner-active .block_news_items .name {
+  margin: 0 !important;
+  color: var(--pc-text) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+html.portal-cleaner-active .block_news_items .info {
+  margin: 0 !important;
+  color: var(--pc-text) !important;
+  font-size: 0.75rem !important;
+  line-height: 1.55 !important;
+  text-align: left !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+html.portal-cleaner-active .block_news_items li.post[data-portal-cleaner-enhanced="true"] .info::after {
+  content: " ..." !important;
+  color: var(--pc-primary) !important;
+  font-weight: 600 !important;
+}
+
+html.portal-cleaner-active .block_news_items .info a:not(.portal-cleaner-original-content) {
+  display: inline !important;
+  margin-left: 0.25rem !important;
+  font-size: inherit !important;
+  white-space: nowrap !important;
+}
+
+html.portal-cleaner-active .block_news_items .info a.portal-cleaner-original-content {
+  display: none !important;
+}
+
+html.portal-cleaner-active .block_news_items .footer {
+  margin-top: 0.6rem !important;
+  padding-top: 0.5rem !important;
+  border-top: 1px solid var(--pc-line) !important;
+  text-align: left !important;
+  font-size: 0.75rem !important;
+}

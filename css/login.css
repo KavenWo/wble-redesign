@@ -1,0 +1,312 @@
+/* ==========================================================================
+   Login Module
+   ==========================================================================
+   Rebuilds the login screen into a calmer single-column experience while
+   preserving the original Moodle markup and submission flow underneath.
+   ========================================================================== */
+
+/* Login pages should feel like a focused entry point rather than a portal page
+   with leftover chrome. Use a softer canvas and narrower reading width. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] body,
+html.portal-cleaner-active body#login-index {
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 32%),
+    linear-gradient(180deg, #f4f8ff 0%, #edf4ff 100%) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #page {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 1.25rem 2rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+/* The breadcrumb and footer repeat the same state information on the login
+   screen and compete with the actual sign-in form, so hide that extra chrome. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .navbar,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #footer,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #footer .homelink,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #footer .helplink,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #footer hr,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] [data-portal-cleaner-role="redundant-login-status"] {
+  display: none !important;
+}
+
+/* Replace the old fixed-height header spacing with a compact intro block. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #header,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #header-home {
+  background: transparent !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-new {
+  margin-bottom: 1rem !important;
+  padding-top: 1.25rem !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-container {
+  min-height: 76px !important;
+  height: auto !important;
+  width: min(50vw, 640px) !important;
+  padding: 0.85rem 1rem !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(14px) !important;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-logo img {
+  height: 56px !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-actions {
+  gap: 0.75rem !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-name {
+  font-size: 0.8rem !important;
+  color: var(--pc-muted) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-logout {
+  display: none !important;
+}
+
+/* LOGIN FORM layout */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #content {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 1rem 0 2rem !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: visible !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginbox {
+  width: min(30vw, 640px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: visible !important;
+}
+
+/* Moodle wraps the login panel in a few structural helper classes that can
+   still carry old borders or inset backgrounds from the legacy theme. Strip
+   those shells so only the redesigned panel is visible. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginbox.clearfix,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginbox.onecolumn,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginbox.clearfix.onecolumn,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .subcontent {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  overflow: visible !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginpanel {
+  position: relative !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  border-radius: 24px !important;
+  box-shadow:
+    0 24px 48px -24px rgba(15, 23, 42, 0.22),
+    0 12px 24px -18px rgba(37, 99, 235, 0.18),
+    0 2px 6px rgba(15, 23, 42, 0.04) !important;
+  overflow: hidden !important;
+}
+
+/* Use a soft internal halo to separate the panel from the background without
+   relying on a harsh outer border that makes the card read like a rectangle. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginpanel::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  pointer-events: none !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginpanel h2 {
+  margin: 0 !important;
+  padding: 1.5rem 1.5rem 0 !important;
+  font-size: 1.25rem !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: 0 !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginsub,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .forgotsub {
+  padding: 1rem 1.5rem 1.5rem !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .desc {
+  margin: 0 0 1.25rem !important;
+  color: var(--pc-muted) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.6 !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .helplink,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .iconhelp {
+  display: none !important;
+}
+
+/* Convert the old label/input rows into a clean vertical stack. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform {
+  padding: 0 !important;
+  display: block !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .form-label,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .form-input {
+  float: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .form-label {
+  margin-top: 0.85rem !important;
+  margin-bottom: 0.35rem !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .form-label:first-child {
+  margin-top: 0 !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform label {
+  display: block !important;
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #475569 !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform input[type="text"],
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform input[type="password"] {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 0.7rem 0.85rem !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 12px !important;
+  background: #f8fbff !important;
+  color: #0f172a !important;
+  font-size: 0.75rem !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform input[type="text"]:focus,
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform input[type="password"]:focus {
+  border-color: rgba(37, 99, 235, 0.55) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+  outline: none !important;
+}
+
+/* Give the captcha room to breathe so it reads as a step, not as a jammed
+   add-on under the password field. */
+/* Compact the captcha to save space and keep it professional. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .g-recaptcha {
+  margin-top: 0.75rem !important;
+  transform: scale(0.7) !important;
+  transform-origin: left top !important;
+  height: 64px !important; /* Approx scaled height of standard captcha */
+  width: 238px !important;
+  margin-bottom: -4px !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #captcha {
+  display: block !important;
+  min-height: 0 !important;
+  margin-top: -4px !important;
+  font-size: 0.7rem !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform input[type="submit"] {
+  width: 100% !important;
+  margin-top: 1rem !important;
+  min-height: 42px !important;
+  border: none !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+  color: #ffffff !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.22) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform input[type="submit"]:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 10px rgba(37, 99, 235, 0.28) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform input[type="hidden"] {
+  display: none !important;
+}
+
+/* Supporting panel copy should read like help text, not a second form. */
+/* Old Moodle clearfix helpers leave visual litter once the float layout is
+   removed, so collapse them on the login form. */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .clearer {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] #page {
+    padding-inline: 0.9rem !important;
+  }
+
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-container,
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginbox {
+    width: 100% !important;
+  }
+
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform {
+    display: block !important;
+  }
+
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .form-label,
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .form-input {
+    width: 100% !important;
+  }
+
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform .form-label {
+    margin-top: 0.8rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .portal-cleaner-header-container {
+    width: 100% !important;
+    min-height: 68px !important;
+  }
+
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginpanel h2 {
+    font-size: 0.92rem !important;
+    padding-left: 1.1rem !important;
+    padding-right: 1.1rem !important;
+  }
+
+  html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginsub {
+    padding-left: 1.1rem !important;
+    padding-right: 1.1rem !important;
+  }
+}

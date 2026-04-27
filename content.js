@@ -7,22 +7,116 @@ const STORAGE_KEY = "cleanerEnabled";
 function setCleanerState(enabled) {
   document.documentElement.classList.toggle(ROOT_CLASS, enabled);
   document.documentElement.classList.toggle(DISABLED_CLASS, !enabled);
+  syncNewsBlockState(enabled);
+}
+
+function isCleanerEnabled() {
+  return document.documentElement.classList.contains(ROOT_CLASS);
 }
 
 // Small proof-of-feasibility tweak: rename the default login heading to
 // something a bit clearer without changing the actual login flow.
 function relabelLoginPage() {
-  const heading = document.querySelector("h1, h2, .login-heading");
+  if (document.documentElement.dataset.portalCleanerPage !== "login") {
+    return;
+  }
+
+  const heading = document.querySelector(".loginpanel h2, .loginpanel .login-heading");
 
   if (!heading) {
     return;
   }
 
-  const text = heading.textContent?.trim() ?? "";
+  heading.textContent = "Login to WBLE";
+}
 
-  if (text.includes("Returning to this web site?")) {
-    heading.textContent = "Sign in to WBLE";
+// Some legacy login responses render stray text nodes before the real page
+// wrapper. Keep them in the DOM for reversibility, but tuck them away so they
+// do not leak into the visual layout.
+function hideLegacyLoginBodyText() {
+  if (document.documentElement.dataset.portalCleanerPage !== "login") {
+    return;
   }
+
+  const page = document.getElementById("page");
+
+  if (!page) {
+    return;
+  }
+
+  const leadingNodes = Array.from(document.body.childNodes);
+
+  for (const node of leadingNodes) {
+    if (node === page) {
+      break;
+    }
+
+    if (node.nodeType !== Node.TEXT_NODE) {
+      continue;
+    }
+
+    const text = node.textContent?.trim() ?? "";
+
+    if (!text || !/^[\d\s]+$/.test(text)) {
+      continue;
+    }
+
+    if (text === "0102") {
+      const hiddenText = document.createElement("span");
+      hiddenText.className = "portal-cleaner-original-content";
+      hiddenText.dataset.portalCleanerLegacyText = "login-body-prefix";
+      hiddenText.textContent = text;
+      node.parentNode?.replaceChild(hiddenText, node);
+    }
+  }
+}
+
+// The login page has duplicate "You are not logged in (Login)" status blocks in
+// both the header and footer. Rename the useful header copy and mark the
+// redundant footer copy so CSS can hide it safely.
+function normalizeLoginChrome() {
+  if (document.documentElement.dataset.portalCleanerPage !== "login") {
+    return;
+  }
+
+  const headerLoginInfo = document.querySelector("#header .logininfo");
+
+  if (headerLoginInfo && headerLoginInfo.dataset.portalCleanerNormalized !== "true") {
+    headerLoginInfo.dataset.portalCleanerNormalized = "true";
+    headerLoginInfo.textContent = "Student and staff login portal";
+  }
+
+  const footerLoginInfo = document.querySelector("#footer .logininfo");
+
+  if (footerLoginInfo) {
+    footerLoginInfo.dataset.portalCleanerRole = "redundant-login-status";
+  }
+}
+
+// The legacy login page includes explanatory copy and a secondary support
+// block that add visual noise without helping users complete the task. Keep
+// the form intact, but trim the surrounding content to a single clear heading.
+function simplifyLoginContent() {
+  if (document.documentElement.dataset.portalCleanerPage !== "login") {
+    return;
+  }
+
+  const loginPanel = document.querySelector(".loginpanel");
+
+  if (!loginPanel) {
+    return;
+  }
+
+  const contentToHide = loginPanel.querySelectorAll(".loginsub .desc, .forgotsub");
+
+  contentToHide.forEach((element) => {
+    if (element.dataset.portalCleanerSimplified === "true") {
+      return;
+    }
+
+    element.dataset.portalCleanerSimplified = "true";
+    element.classList.add("portal-cleaner-original-content");
+  });
 }
 
 function splitCourseLabel(text) {
@@ -139,6 +233,83 @@ function setupCourseToggle() {
   list.dataset.portalCleanerToggleInitialized = "true";
 }
 
+function syncNewsBlockState(enabled) {
+  const posts = document.querySelectorAll('.block_news_items.sideblock li.post[data-portal-cleaner-enhanced="true"]');
+
+  posts.forEach((post) => {
+    if (enabled) {
+      post.tabIndex = 0;
+      post.setAttribute("role", "link");
+
+      if (post.dataset.portalCleanerAriaLabel) {
+        post.setAttribute("aria-label", post.dataset.portalCleanerAriaLabel);
+      }
+
+      return;
+    }
+
+    post.removeAttribute("tabindex");
+    post.removeAttribute("role");
+    post.removeAttribute("aria-label");
+  });
+}
+
+// Turns each Latest News post into a full clickable card while preserving the
+// original anchor target in the DOM for a reversible enhancement.
+function enhanceNewsBlock() {
+  const posts = document.querySelectorAll(".block_news_items.sideblock li.post");
+
+  posts.forEach((post) => {
+    if (post.dataset.portalCleanerEnhanced === "true") {
+      return;
+    }
+
+    const info = post.querySelector(".info");
+    const moreLink = info?.querySelector("a");
+
+    if (!info || !moreLink?.href) {
+      return;
+    }
+
+    post.dataset.portalCleanerEnhanced = "true";
+    post.dataset.portalCleanerHref = moreLink.href;
+    post.dataset.portalCleanerAriaLabel = `Open news item: ${(info.textContent ?? "").replace(/\s+/g, " ").trim()}`;
+
+    moreLink.classList.add("portal-cleaner-original-content");
+    moreLink.setAttribute("tabindex", "-1");
+    moreLink.setAttribute("aria-hidden", "true");
+
+    const openPost = () => {
+      window.location.href = moreLink.href;
+    };
+
+    post.addEventListener("click", (event) => {
+      if (!isCleanerEnabled()) {
+        return;
+      }
+
+      if (event.target instanceof HTMLAnchorElement) {
+        return;
+      }
+
+      openPost();
+    });
+
+    post.addEventListener("keydown", (event) => {
+      if (!isCleanerEnabled()) {
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openPost();
+      }
+    });
+  });
+
+  syncNewsBlockState(isCleanerEnabled());
+}
+
 // Marks the current page type on <html> so CSS can target login pages more
 // safely than relying only on broad global selectors.
 function addPageMarkers() {
@@ -209,7 +380,11 @@ function rebuildHeader() {
 function enhancePage() {
   addPageMarkers();
   relabelLoginPage();
+  hideLegacyLoginBodyText();
+  normalizeLoginChrome();
+  simplifyLoginContent();
   enhanceCourseListBlock();
+  enhanceNewsBlock();
   rebuildHeader();
 }
 
