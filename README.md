@@ -52,7 +52,7 @@ To ensure this extension remains robust and allows for safe, instant toggling be
 
 1. **Never Delete Original DOM**: Do not use `.innerHTML = ""` or `.remove()` on existing portal elements. 
 2. **Additive Injection**: When injecting new UI components (like the modern header or icons), place them alongside the original elements. Hide the original text/elements using CSS or by wrapping them in hidden spans.
-3. **CSS Manages State & Order**: The `styles.css` file is the sole source of truth for visibility and layout.
+3. **CSS Manages State & Order**: The modular stylesheets in `css/` are the source of truth for visibility and layout.
    - We use the `html.portal-cleaner-active` class to trigger the redesign.
    - When active, CSS hides legacy elements and displays the injected UI.
    - **Crucially**, we use CSS Flexbox `order` (e.g., `order: -1`) to reposition panels and sort lists instead of physically moving DOM nodes in JavaScript.

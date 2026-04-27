@@ -12,7 +12,7 @@ function setCleanerState(enabled) {
 // Small proof-of-feasibility tweak: rename the default login heading to
 // something a bit clearer without changing the actual login flow.
 function relabelLoginPage() {
-  const heading = document.querySelector(".loginpanel h2");
+  const heading = document.querySelector("h1, h2, .login-heading");
 
   if (!heading) {
     return;
@@ -21,31 +21,7 @@ function relabelLoginPage() {
   const text = heading.textContent?.trim() ?? "";
 
   if (text.includes("Returning to this web site?")) {
-    heading.textContent = "Welcome Back";
-  }
-}
-
-/**
- * Specifically targets the "0102" text node at the top of the body on the login page.
- */
-function cleanLoginJunk() {
-  if (document.documentElement.dataset.portalCleanerPage !== "login") return;
-
-  // The "0102" is a raw text node immediately following the <body> opening.
-  const body = document.body;
-  const nodes = body.childNodes;
-
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    // Look for text nodes that contain "0102"
-    if (node.nodeType === Node.TEXT_NODE && node.textContent.includes("0102")) {
-      // Instead of deleting, we wrap it in a hidden span to maintain non-destructiveness
-      const span = document.createElement("span");
-      span.className = "portal-cleaner-original-content";
-      span.textContent = node.textContent;
-      body.replaceChild(span, node);
-      break;
-    }
+    heading.textContent = "Sign in to WBLE";
   }
 }
 
@@ -166,7 +142,7 @@ function setupCourseToggle() {
 // Marks the current page type on <html> so CSS can target login pages more
 // safely than relying only on broad global selectors.
 function addPageMarkers() {
-  if (window.location.pathname.includes("/login/") || document.body.id === "login-index") {
+  if (window.location.pathname.includes("/login/")) {
     document.documentElement.dataset.portalCleanerPage = "login";
   } else {
     document.documentElement.dataset.portalCleanerPage = "portal";
@@ -232,7 +208,6 @@ function rebuildHeader() {
 // single place that wires together per-page UI upgrades.
 function enhancePage() {
   addPageMarkers();
-  cleanLoginJunk();
   relabelLoginPage();
   enhanceCourseListBlock();
   rebuildHeader();
