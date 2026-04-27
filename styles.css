@@ -99,8 +99,147 @@ html.portal-cleaner-active table.generaltable {
 
 /* Hide legacy bulky header elements immediately */
 html.portal-cleaner-active #header table,
-html.portal-cleaner-active #header-home table {
+html.portal-cleaner-active #header-home table,
+html.portal-cleaner-active [data-portal-cleaner-page="login"] #header,
+html.portal-cleaner-active [data-portal-cleaner-page="login"] #footer,
+html.portal-cleaner-active [data-portal-cleaner-page="login"] .navbar {
   display: none !important;
+}
+
+/* Login Page Transformation */
+html.portal-cleaner-active[data-portal-cleaner-page="login"] body {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: radial-gradient(circle at top left, #2563eb, #1e3a8a) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #page {
+  width: 100% !important;
+  max-width: 400px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] #content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginbox {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 24px !important;
+  padding: 2.5rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  width: 100% !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginpanel h2 {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  margin-bottom: 0.5rem !important;
+  text-align: center !important;
+  background: none !important;
+  border: none !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginsub .desc {
+  font-size: 0.875rem !important;
+  color: #64748b !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .loginform {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .form-label {
+  display: block !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  margin-bottom: 0.5rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.025em !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .form-input {
+  margin-bottom: 1.5rem !important;
+  width: 100% !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .form-input input {
+  width: 100% !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 1rem !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+  background: #f8fafc !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .form-input input:focus {
+  border-color: #2563eb !important;
+  background: #ffffff !important;
+  outline: none !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .g-recaptcha {
+  margin: 1.5rem 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] input[type="submit"] {
+  width: 100% !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  padding: 0.875rem !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  margin-top: 0.5rem !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] input[type="submit"]:hover {
+  background: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .forgotsub {
+  margin-top: 2rem !important;
+  padding-top: 1.5rem !important;
+  border-top: 1px solid #e2e8f0 !important;
+  text-align: center !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .forgotsub .desc {
+  font-size: 0.75rem !important;
+  color: #94a3b8 !important;
+  line-height: 1.5 !important;
+}
+
+html.portal-cleaner-active[data-portal-cleaner-page="login"] .forgotsub a {
+  color: #2563eb !important;
+  font-weight: 500 !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-header-container {
