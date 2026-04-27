@@ -1,0 +1,85 @@
+/* ==========================================================================
+   Header Module
+   ==========================================================================
+   Responsible for hiding the legacy Moodle header tables and injecting the
+   modern, full-width flex header containing the university logo and user
+   logout actions.
+   ========================================================================== */
+
+/* Hide legacy bulky header elements */
+html.portal-cleaner-active #header table,
+html.portal-cleaner-active #header-home table {
+  display: none !important;
+}
+
+/* New Header Design */
+html.portal-cleaner-active #header,
+html.portal-cleaner-active #header-home {
+  background-color: #dbeafe !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-new {
+  background: transparent !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-new {
+  width: 100% !important;
+  margin: 0 0 1rem !important;
+  padding: 0.75rem 0 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-container {
+  width: 90% !important;
+  height: 56px !important;
+  margin: 0 auto !important;
+  padding: 0 0.5rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-logo img {
+  height: 70px !important;
+  width: auto !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1.25rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-name {
+  color: #000000 !important;
+  font-weight: 500 !important;
+  font-size: 0.65rem !important;
+  text-decoration: none !important;
+  transition: text-decoration 150ms ease !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-name:hover {
+  text-decoration: underline !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-logout {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 8px !important;
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+  font-weight: 600 !important;
+  font-size: 0.65rem !important;
+  border: 1px solid #fee2e2 !important;
+  transition: all 150ms ease !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-logout:hover {
+  background-color: #fee2e2 !important;
+  border-color: #fecaca !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.05) !important;
+}

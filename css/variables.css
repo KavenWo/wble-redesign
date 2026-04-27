@@ -1,0 +1,58 @@
+/* ==========================================================================
+   Variables & Base Resets Module
+   ==========================================================================
+   Defines the core design tokens (colors, fonts, shadows) and applies global
+   resets (typography, base link states) for the clean UI theme.
+   ========================================================================== */
+
+:root {
+  --pc-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --pc-bg: #f5f9ff;
+  --pc-surface: #ffffff;
+  --pc-surface-alt: #f8fbff;
+  --pc-text: #1a202c;
+  --pc-muted: #64748b;
+  --pc-line: #e2e8f0;
+  --pc-primary: #2563eb;
+  --pc-primary-strong: #1d4ed8;
+  --pc-primary-soft: #eff6ff;
+  --pc-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --pc-radius: 12px;
+}
+
+/* Base resets and Typography */
+html.portal-cleaner-active body {
+  background-color: var(--pc-bg) !important;
+  color: var(--pc-text) !important;
+  font-family: var(--pc-font) !important;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+html.portal-cleaner-active a {
+  color: var(--pc-primary) !important;
+  text-decoration: none !important;
+}
+
+html.portal-cleaner-active a:hover {
+  color: var(--pc-primary-strong) !important;
+  text-decoration: none !important;
+}
+
+html.portal-cleaner-active input,
+html.portal-cleaner-active select,
+html.portal-cleaner-active textarea,
+html.portal-cleaner-active button {
+  font-family: var(--pc-font) !important;
+}
+
+/* Toggle visibility for non-destructive DOM changes */
+html.portal-cleaner-active .portal-cleaner-original-content {
+  display: none !important;
+}
+
+html:not(.portal-cleaner-active) .portal-cleaner-course-icon,
+html:not(.portal-cleaner-active) .portal-cleaner-course-info,
+html:not(.portal-cleaner-active) .portal-cleaner-header-new {
+  display: none !important;
+}

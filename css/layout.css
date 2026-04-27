@@ -1,0 +1,204 @@
+/* ==========================================================================
+   Layout & Structure Module
+   ==========================================================================
+   Manages the global grid, spacing, and structural borders of the portal.
+   Includes styling for the main content regions, sidebars, blocks, and 
+   general table beautification.
+   ========================================================================== */
+
+/* Main Content Areas */
+html.portal-cleaner-active #region-main,
+html.portal-cleaner-active .course-content,
+html.portal-cleaner-active .generalbox,
+html.portal-cleaner-active .card,
+html.portal-cleaner-active .coursebox,
+html.portal-cleaner-active .mycourse,
+html.portal-cleaner-active .overview {
+  background: var(--pc-surface) !important;
+  border: 1px solid var(--pc-line) !important;
+  box-shadow: var(--pc-shadow) !important;
+  border-radius: var(--pc-radius) !important;
+}
+
+/* Keep the outer content wrapper neutral so the navbar can visually connect to
+   the actual content panel below it. */
+html.portal-cleaner-active #content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Global reset to prevent padding/borders from expanding widths */
+html.portal-cleaner-active *,
+html.portal-cleaner-active *::before,
+html.portal-cleaner-active *::after {
+  box-sizing: border-box !important;
+}
+
+/* Sidebar structure - Converted to Flexbox for robust 100% width management */
+html.portal-cleaner-active #region-post-box {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow: hidden !important;
+  gap: 0 !important; /* Spacing handled by column padding */
+}
+
+html.portal-cleaner-active #left-column,
+html.portal-cleaner-active #region-pre {
+  width: 20% !important;
+  min-width: 240px !important;
+  flex: 0 0 15% !important;
+  order: 1 !important;
+  padding-right: 0.1rem !important; /* Reduced gutter */
+  margin: 0 !important;
+}
+
+html.portal-cleaner-active #region-main-wrap,
+html.portal-cleaner-active #middle-column,
+html.portal-cleaner-active #center-column {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  order: 2 !important;
+  width: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+html.portal-cleaner-active #right-column,
+html.portal-cleaner-active #region-post {
+  width: 15% !important;
+  min-width: 240px !important;
+  flex: 0 0 15% !important;
+  order: 3 !important;
+  padding-left: 0.1rem !important; /* Reduced gutter */
+  margin: 0 !important;
+}
+
+html.portal-cleaner-active #page {
+  width: 100% !important;
+  margin: 0 !important;
+  max-width: 100vw !important;
+}
+
+html.portal-cleaner-active .card-body,
+html.portal-cleaner-active .block,
+html.portal-cleaner-active .sideblock,
+html.portal-cleaner-active .generalbox,
+html.portal-cleaner-active .coursebox,
+html.portal-cleaner-active .loginform {
+  padding: 1rem !important;
+}
+
+/* Merge navbar with content by removing the top border separator on main region */
+html.portal-cleaner-active #region-main {
+  border-top: none !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+html.portal-cleaner-active .course-content,
+html.portal-cleaner-active #region-main,
+html.portal-cleaner-active .weeks,
+html.portal-cleaner-active .frontpage-course-list {
+  position: relative !important;
+  margin-top: 0 !important;
+}
+
+html.portal-cleaner-active .course-content {
+  padding-top: 0.75rem !important;
+  border-top: none !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+/* Table beautification - Scoped to real data tables */
+html.portal-cleaner-active table.generaltable,
+html.portal-cleaner-active .MsoNormalTable {
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
+}
+
+html.portal-cleaner-active table.generaltable tr,
+html.portal-cleaner-active .MsoNormalTable tr {
+  background: var(--pc-surface-alt) !important;
+}
+
+html.portal-cleaner-active table.generaltable td,
+html.portal-cleaner-active table.generaltable th,
+html.portal-cleaner-active .MsoNormalTable td,
+html.portal-cleaner-active .MsoNormalTable th {
+  border-top: 1px solid var(--pc-line) !important;
+  border-bottom: 1px solid var(--pc-line) !important;
+  padding: 0.85rem 1rem !important;
+}
+
+html.portal-cleaner-active table.generaltable td:first-child,
+html.portal-cleaner-active table.generaltable th:first-child,
+html.portal-cleaner-active .MsoNormalTable td:first-child,
+html.portal-cleaner-active .MsoNormalTable th:first-child {
+  border-left: 1px solid var(--pc-line) !important;
+  border-top-left-radius: 12px !important;
+  border-bottom-left-radius: 12px !important;
+}
+
+html.portal-cleaner-active table.generaltable td:last-child,
+html.portal-cleaner-active table.generaltable th:last-child,
+html.portal-cleaner-active .MsoNormalTable td:last-child,
+html.portal-cleaner-active .MsoNormalTable th:last-child {
+  border-right: 1px solid var(--pc-line) !important;
+  border-top-right-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Block and Section Headers - Minimalist design matching the course list vibes */
+html.portal-cleaner-active .block .header,
+html.portal-cleaner-active .sideblock .header {
+  background: transparent !important;
+  border-bottom: none !important;
+  padding: 0.75rem 0.5rem 0.25rem !important;
+  margin-bottom: 0 !important;
+}
+
+html.portal-cleaner-active .header h2,
+html.portal-cleaner-active .block .header h2,
+html.portal-cleaner-active .sideblock .header h2 {
+  font-size: 0.6rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--pc-muted) !important;
+  opacity: 0.7 !important;
+  margin: 0 !important;
+}
+
+/* Generic headings that aren't in sidebar blocks */
+html.portal-cleaner-active .headingblock,
+html.portal-cleaner-active .generalbox .header {
+  background: var(--pc-surface-alt) !important;
+  border-bottom: 1px solid var(--pc-line) !important;
+  padding: 1rem !important;
+}
+
+/* On course pages, the first heading block sits directly under the navbar and
+   should visually merge into the same content surface rather than creating a
+   second top edge. */
+html.portal-cleaner-active #middle-column .headingblock.header.outline,
+html.portal-cleaner-active #center-column .headingblock.header.outline {
+  margin-top: 0 !important;
+  border-top: none !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Form Styling */
+html.portal-cleaner-active .form-control,
+html.portal-cleaner-active input[type="text"],
+html.portal-cleaner-active input[type="password"] {
+  border: 1px solid var(--pc-line) !important;
+  border-radius: 12px !important;
+  min-height: 44px !important;
+}

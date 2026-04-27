@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "UTAR WBLE Cleaner",
+  "version": "0.1.0",
+  "description": "Light UI cleanup for the UTAR WBLE portal.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://ewble-sl.utar.edu.my/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://ewble-sl.utar.edu.my/*"],
+      "css": [
+        "css/variables.css",
+        "css/layout.css",
+        "css/header.css",
+        "css/navigation.css",
+        "css/courses.css"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "UTAR WBLE Cleaner"
+  }
+}

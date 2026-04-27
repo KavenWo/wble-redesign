@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UTAR WBLE Cleaner</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-width: 260px;
+        background: #f4f7fb;
+        color: #1f2937;
+      }
+
+      main {
+        padding: 16px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 0 0 16px;
+        color: #5f6b7a;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        border: 1px solid #d8e1ec;
+        border-radius: 12px;
+        padding: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>UTAR WBLE Cleaner</h1>
+      <p>Enable or disable the lightweight portal cleanup.</p>
+      <label>
+        <input type="checkbox" id="toggleCleaner" />
+        Enable cleaner mode
+      </label>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

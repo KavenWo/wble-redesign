@@ -1,0 +1,223 @@
+/* ==========================================================================
+   Courses Module
+   ==========================================================================
+   Handles the redesign of the "My Courses" list in the sidebar, including
+   Flexbox reordering, custom icons, and typography. Also styles course 
+   boxes on the home page.
+   ========================================================================== */
+
+/* Clean, minimalist My courses block redesign */
+html.portal-cleaner-active .block_course_list.sideblock,
+html.portal-cleaner-active .sideblock,
+html.portal-cleaner-active .block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html.portal-cleaner-active .block_course_list.sideblock .content {
+  padding: 0.5rem !important;
+}
+
+/* Hide legacy icons and columns when active */
+html.portal-cleaner-active .block_course_list.sideblock .column.c0 {
+  display: none !important;
+}
+
+/* CSS-Based Reordering: Safe Toggle Architecture */
+html.portal-cleaner-active #left-column > div,
+html.portal-cleaner-active #right-column > div,
+html.portal-cleaner-active .side-pre > div,
+html.portal-cleaner-active .side-post > div {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Push My Courses panel to the very top */
+html.portal-cleaner-active .block_course_list.sideblock {
+  order: -1 !important;
+}
+
+html.portal-cleaner-active .block_course_list.sideblock .list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* CSS-based sorting: COURSES WITH CODE float up, others drop down */
+html.portal-cleaner-active .block_course_list.sideblock .list li[data-portal-cleaner-has-code="true"] {
+  order: 1 !important;
+}
+
+html.portal-cleaner-active .block_course_list.sideblock .list li[data-portal-cleaner-has-code="false"] {
+  order: 2 !important;
+  display: none !important; /* Hide other portals by default */
+}
+
+/* Show other portals only when expanded */
+html.portal-cleaner-active .block_course_list.sideblock .list.portal-cleaner-expanded li[data-portal-cleaner-has-code="false"] {
+  display: block !important;
+}
+
+/* Visual divider when expanded */
+html.portal-cleaner-active .block_course_list.sideblock .list.portal-cleaner-expanded {
+  padding-bottom: 0.5rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-toggle {
+  margin: 0.1rem auto !important;
+  width: 2rem !important;
+  height: 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-toggle:hover {
+  background: var(--pc-primary-soft) !important;
+  transform: scale(1.1) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-toggle .portal-cleaner-toggle-icon {
+  width: 1rem !important;
+  height: 1rem !important;
+  background: var(--pc-muted) !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms ease !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-toggle:hover .portal-cleaner-toggle-icon {
+  background: var(--pc-primary) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-toggle.active .portal-cleaner-toggle-icon {
+  transform: rotate(180deg) !important;
+}
+
+html.portal-cleaner-active .block_course_list.sideblock .list li {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  min-height: 0 !important;
+}
+
+/* Ensure legacy column wrappers don't introduce ghost spacing, 
+   but ignore .c0 to keep the original icons hidden. */
+html.portal-cleaner-active .block_course_list.sideblock .list li div:not(.c0),
+html.portal-cleaner-active .block_course_list.sideblock .list li .column:not(.c0) {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  min-height: 0 !important;
+}
+
+/* Course Link Components */
+html.portal-cleaner-active .portal-cleaner-course-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.3rem !important;
+  padding: 0.5rem 0.5rem !important;
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: var(--pc-text) !important;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-link:hover {
+  background-color: var(--pc-surface) !important;
+  border-color: var(--pc-line) !important;
+  box-shadow: var(--pc-shadow) !important;
+  transform: translateX(2px) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-icon {
+  flex: 0 0 auto !important;
+  width: 1rem !important;
+  height: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--pc-primary) !important;
+  position: relative !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-icon::before {
+  content: "" !important;
+  width: 1rem !important;
+  height: 1rem !important;
+  background: currentColor !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.75 6.75A2.75 2.75 0 0 1 7.5 4h9A2.75 2.75 0 0 1 19.25 6.75v10.5A2.75 2.75 0 0 1 16.5 20h-9a2.75 2.75 0 0 1-2.75-2.75V6.75Z'/%3E%3Cpath d='M8.5 8.25h7M8.5 12h7M8.5 15.75h4.5'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.75 6.75A2.75 2.75 0 0 1 7.5 4h9A2.75 2.75 0 0 1 19.25 6.75v10.5A2.75 2.75 0 0 1 16.5 20h-9a2.75 2.75 0 0 1-2.75-2.75V6.75Z'/%3E%3Cpath d='M8.5 8.25h7M8.5 12h7M8.5 15.75h4.5'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-info {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-title {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: var(--pc-text) !important;
+  overflow: hidden !important;
+  word-break: break-word !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-course-code {
+  display: block !important;
+  font-size: 0.5rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  color: var(--pc-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Home/front-page Compatibility */
+html.portal-cleaner-active .coursebox,
+html.portal-cleaner-active .mycourse,
+html.portal-cleaner-active .frontpage-course-list .coursebox {
+  margin-bottom: 0.5rem !important;
+  border-radius: var(--pc-radius) !important;
+  border: 1px solid var(--pc-line) !important;
+  background: var(--pc-surface) !important;
+  box-shadow: var(--pc-shadow) !important;
+}
+
+html.portal-cleaner-active .coursebox .info,
+html.portal-cleaner-active .mycourse .info,
+html.portal-cleaner-active .coursebox .content,
+html.portal-cleaner-active .mycourse .content {
+  padding: 1rem !important;
+}
+
+html.portal-cleaner-active .coursebox .name a,
+html.portal-cleaner-active .mycourse .name a,
+html.portal-cleaner-active .coursebox .coursename a,
+html.portal-cleaner-active .mycourse .coursename a {
+  color: var(--pc-text) !important;
+  font-family: var(--pc-font) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+html.portal-cleaner-active .coursebox .name a:hover,
+html.portal-cleaner-active .mycourse .name a:hover,
+html.portal-cleaner-active .coursebox .coursename a:hover,
+html.portal-cleaner-active .mycourse .coursename a:hover {
+  color: var(--pc-primary) !important;
+}
