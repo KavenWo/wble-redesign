@@ -4,7 +4,7 @@ A clean and modern reskin for the UTAR WBLE portal (`https://ewble-sl.utar.edu.m
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Load the extension locally
 1. **Clone or Download** this repository to your computer.
@@ -16,7 +16,7 @@ A clean and modern reskin for the UTAR WBLE portal (`https://ewble-sl.utar.edu.m
 
 ---
 
-## 🛠️ Contribution Workflow
+## Contribution Workflow
 
 We welcome contributions! Whether you're fixing a bug or suggesting a new design element, follow these steps:
 
@@ -46,16 +46,26 @@ We welcome contributions! Whether you're fixing a bug or suggesting a new design
 
 ---
 
-## 🏗️ Architecture: Non-Destructive CSS Toggling
+## Architecture: Refresh-On-Off Toggle
 
-To ensure this extension remains robust and allows for safe, instant toggling between "Clean Mode" and the original Moodle layout, all UI enhancements must follow these core architectural rules:
+To keep the redesign flexible while preserving confidence in the original Moodle experience, the extension now uses a refresh-on-off architecture:
 
-1. **Never Delete Original DOM**: Do not use `.innerHTML = ""` or `.remove()` on existing portal elements. 
-2. **Additive Injection**: When injecting new UI components (like the modern header or icons), place them alongside the original elements. Hide the original text/elements using CSS or by wrapping them in hidden spans.
-3. **CSS Manages State & Order**: The modular stylesheets in `css/` are the source of truth for visibility and layout.
-   - We use the `html.portal-cleaner-active` class to trigger the redesign.
-   - When active, CSS hides legacy elements and displays the injected UI.
-   - **Crucially**, we use CSS Flexbox `order` (e.g., `order: -1`) to reposition panels and sort lists instead of physically moving DOM nodes in JavaScript.
-   - When the toggle is disabled, the root class is removed, all CSS rules vanish, and the portal instantly snaps back to its original layout with zero JavaScript revert logic required.
-4. **Minimize JavaScript Bloat**: Prioritize CSS for layout and styling changes. Use JavaScript only when absolutely necessary (e.g., for complex DOM injection or state logic that CSS cannot handle). This keeps the extension lightweight and ensures high performance.
+1. **Turning on can happen live**: If the redesign is enabled while the user is already on WBLE, the current tab can apply the redesign immediately.
+2. **Turning off refreshes the page**: Disabling the redesign reloads the active WBLE tab so the next page load happens without redesign behavior.
+3. **Controller and redesign logic are separate**:
+   - `controller.js` reads the saved toggle state and decides whether the redesign app should run.
+   - `content.js` contains the redesign behavior itself.
+   - `background.js` handles the tab refresh flow when the user disables the redesign from the popup.
+4. **Page-load state is the source of truth**:
+   - If the redesign is off when the page loads, the redesign app does not mount.
+   - If the redesign is on, the redesign app can enhance the page for that session.
+   - Turning the redesign off no longer depends on undoing every JavaScript side effect live.
+5. **Never delete original DOM**: Do not use `.innerHTML = ""` or `.remove()` on existing portal elements unless there is a very strong reason and the impact is fully understood.
+6. **Prefer additive enhancement**: Inject new UI alongside the original structure where practical. Hide or de-emphasize legacy content through CSS instead of destroying it.
+7. **CSS remains the primary tool**:
+   - We still use the `html.portal-cleaner-active` class to trigger redesign styling.
+   - CSS should remain the main source of truth for visibility, layout, and ordering.
+   - Prefer layout techniques such as Flexbox `order` before reaching for JavaScript DOM movement.
+8. **Minimize JavaScript bloat**: Use JavaScript only when CSS cannot achieve the needed UX. JavaScript should focus on focused enhancement work such as DOM injection, semantic upgrades, or interaction behavior that styling alone cannot provide.
 
+This architecture is meant to give contributors more freedom to improve UI and UX without carrying a large amount of toggle-off cleanup logic in every feature.

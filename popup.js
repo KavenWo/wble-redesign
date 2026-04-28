@@ -11,4 +11,9 @@ toggle.addEventListener("change", () => {
   chrome.storage.sync.set({
     [STORAGE_KEY]: toggle.checked
   });
+
+  chrome.runtime.sendMessage({
+    type: "portal-cleaner-toggle-changed",
+    enabled: toggle.checked
+  });
 });
