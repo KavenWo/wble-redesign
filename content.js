@@ -1,17 +1,15 @@
 const ROOT_CLASS = "portal-cleaner-active";
 const DISABLED_CLASS = "portal-cleaner-disabled";
-const STORAGE_KEY = "cleanerEnabled";
+// These guards keep the redesign app from re-running the same setup logic if
+// the controller toggles it on more than once during a single page session.
+let pageEnhancementsApplied = false;
+let domReadyHookRegistered = false;
 
 // Applies a single root class so CSS can be turned on/off without touching
 // individual elements all over the page.
 function setCleanerState(enabled) {
   document.documentElement.classList.toggle(ROOT_CLASS, enabled);
   document.documentElement.classList.toggle(DISABLED_CLASS, !enabled);
-  syncNewsBlockState(enabled);
-}
-
-function isCleanerEnabled() {
-  return document.documentElement.classList.contains(ROOT_CLASS);
 }
 
 // Small proof-of-feasibility tweak: rename the default login heading to
@@ -233,24 +231,19 @@ function setupCourseToggle() {
   list.dataset.portalCleanerToggleInitialized = "true";
 }
 
-function syncNewsBlockState(enabled) {
+// Once the redesign app enhances a news block, it treats the card behavior
+// as permanently active for that page session. 
+// Turning the extension off, causes a full page refresh.
+function applyNewsBlockAccessibility() {
   const posts = document.querySelectorAll('.block_news_items.sideblock li.post[data-portal-cleaner-enhanced="true"]');
 
   posts.forEach((post) => {
-    if (enabled) {
-      post.tabIndex = 0;
-      post.setAttribute("role", "link");
+    post.tabIndex = 0;
+    post.setAttribute("role", "link");
 
-      if (post.dataset.portalCleanerAriaLabel) {
-        post.setAttribute("aria-label", post.dataset.portalCleanerAriaLabel);
-      }
-
-      return;
+    if (post.dataset.portalCleanerAriaLabel) {
+      post.setAttribute("aria-label", post.dataset.portalCleanerAriaLabel);
     }
-
-    post.removeAttribute("tabindex");
-    post.removeAttribute("role");
-    post.removeAttribute("aria-label");
   });
 }
 
@@ -284,10 +277,6 @@ function enhanceNewsBlock() {
     };
 
     post.addEventListener("click", (event) => {
-      if (!isCleanerEnabled()) {
-        return;
-      }
-
       if (event.target instanceof HTMLAnchorElement) {
         return;
       }
@@ -296,10 +285,6 @@ function enhanceNewsBlock() {
     });
 
     post.addEventListener("keydown", (event) => {
-      if (!isCleanerEnabled()) {
-        return;
-      }
-
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         openPost();
@@ -307,7 +292,7 @@ function enhanceNewsBlock() {
     });
   });
 
-  syncNewsBlockState(isCleanerEnabled());
+  applyNewsBlockAccessibility();
 }
 
 // Marks the current page type on <html> so CSS can target login pages more
@@ -388,22 +373,45 @@ function enhancePage() {
   rebuildHeader();
 }
 
-// Default to enabled for the first-run experience, then apply any saved user
-// preference from the popup toggle.
-chrome.storage.sync.get({ [STORAGE_KEY]: true }, (result) => {
-  setCleanerState(Boolean(result[STORAGE_KEY]));
-  enhancePage();
-});
-
-// Keeps the current tab in sync when the popup toggle is changed.
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName !== "sync" || !changes[STORAGE_KEY]) {
+function ensureEnhancementsApplied() {
+  if (pageEnhancementsApplied) {
     return;
   }
 
-  setCleanerState(Boolean(changes[STORAGE_KEY].newValue));
-});
+  // The current migration keeps enhancement application one-way:
+  // once the redesign has mounted for this page session 
+  // turning it off is handled by a full refresh
+  pageEnhancementsApplied = true;
+  enhancePage();
+}
 
-// Run again after the DOM is ready so selectors that are not available at
-// document_start can still be enhanced safely.
-window.addEventListener("DOMContentLoaded", enhancePage);
+function registerDomReadyHook() {
+  if (domReadyHookRegistered) {
+    return;
+  }
+
+  domReadyHookRegistered = true;
+
+  // Run again after the DOM is ready so selectors that are not available at
+  // document_start can still be enhanced safely.
+  window.addEventListener("DOMContentLoaded", ensureEnhancementsApplied, { once: true });
+}
+
+window.PortalCleanerApp = {
+  start(enabled) {
+    // The controller always sets the root CSS state first so styling stays in
+    // sync with the saved preference, even before the rest of the DOM finishes
+    // loading.
+    setCleanerState(Boolean(enabled));
+
+    if (!enabled) {
+      return;
+    }
+
+    // When enabled, this behaves like mounting the redesign app for the current
+    // page session. We apply what we can immediately, then retry once the DOM is
+    // fully ready for selectors that are unavailable at document_start.
+    ensureEnhancementsApplied();
+    registerDomReadyHook();
+  }
+};
