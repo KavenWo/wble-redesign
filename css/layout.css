@@ -26,6 +26,7 @@ html.portal-cleaner-active #content {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  overflow-x: clip !important;
 }
 
 /* Global reset to prevent padding/borders from expanding widths */
@@ -40,16 +41,16 @@ html.portal-cleaner-active #region-post-box {
   display: flex !important;
   flex-direction: row !important;
   width: 100% !important;
-  max-width: 100vw !important;
+  max-width: 100% !important;
   overflow: hidden !important;
   gap: 0 !important; /* Spacing handled by column padding */
 }
 
 html.portal-cleaner-active #left-column,
 html.portal-cleaner-active #region-pre {
-  width: 20% !important;
-  min-width: 240px !important;
-  flex: 0 0 15% !important;
+  width: clamp(180px, 18vw, 240px) !important;
+  min-width: 180px !important;
+  flex: 0 1 clamp(180px, 18vw, 240px) !important;
   order: 1 !important;
   padding-right: 0.1rem !important; /* Reduced gutter */
   margin: 0 !important;
@@ -68,9 +69,9 @@ html.portal-cleaner-active #center-column {
 
 html.portal-cleaner-active #right-column,
 html.portal-cleaner-active #region-post {
-  width: 15% !important;
-  min-width: 240px !important;
-  flex: 0 0 15% !important;
+  width: clamp(180px, 18vw, 240px) !important;
+  min-width: 180px !important;
+  flex: 0 1 clamp(180px, 18vw, 240px) !important;
   order: 3 !important;
   padding-left: 0.1rem !important; /* Reduced gutter */
   margin: 0 !important;
@@ -79,7 +80,8 @@ html.portal-cleaner-active #region-post {
 html.portal-cleaner-active #page {
   width: 100% !important;
   margin: 0 !important;
-  max-width: 100vw !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
 }
 
 html.portal-cleaner-active .card-body,
@@ -117,39 +119,59 @@ html.portal-cleaner-active .course-content {
 html.portal-cleaner-active table.generaltable,
 html.portal-cleaner-active .MsoNormalTable {
   border-collapse: separate !important;
-  border-spacing: 0 8px !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+  margin: 0.75rem 0 !important;
+  background: var(--pc-surface) !important;
+  border: 1px solid var(--pc-line) !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
 }
 
 html.portal-cleaner-active table.generaltable tr,
 html.portal-cleaner-active .MsoNormalTable tr {
-  background: var(--pc-surface-alt) !important;
+  background: transparent !important;
+  transition: background-color 140ms ease !important;
+}
+
+html.portal-cleaner-active table.generaltable tr:nth-child(even),
+html.portal-cleaner-active .MsoNormalTable tr:nth-child(even) {
+  background: rgba(248, 251, 255, 0.6) !important;
+}
+
+html.portal-cleaner-active table.generaltable tr:hover,
+html.portal-cleaner-active .MsoNormalTable tr:hover {
+  background: rgba(241, 245, 249, 0.8) !important;
 }
 
 html.portal-cleaner-active table.generaltable td,
 html.portal-cleaner-active table.generaltable th,
 html.portal-cleaner-active .MsoNormalTable td,
 html.portal-cleaner-active .MsoNormalTable th {
-  border-top: 1px solid var(--pc-line) !important;
+  border: none !important;
   border-bottom: 1px solid var(--pc-line) !important;
-  padding: 0.85rem 1rem !important;
+  padding: 0.7rem 0.9rem !important;
+  font-size: 0.72rem !important;
+  color: var(--pc-text) !important;
+  vertical-align: middle !important;
 }
 
-html.portal-cleaner-active table.generaltable td:first-child,
-html.portal-cleaner-active table.generaltable th:first-child,
-html.portal-cleaner-active .MsoNormalTable td:first-child,
-html.portal-cleaner-active .MsoNormalTable th:first-child {
-  border-left: 1px solid var(--pc-line) !important;
-  border-top-left-radius: 12px !important;
-  border-bottom-left-radius: 12px !important;
+/* Remove bottom border from last row to prevent double border with container */
+html.portal-cleaner-active table.generaltable tr:last-child td,
+html.portal-cleaner-active .MsoNormalTable tr:last-child td {
+  border-bottom: none !important;
 }
 
-html.portal-cleaner-active table.generaltable td:last-child,
-html.portal-cleaner-active table.generaltable th:last-child,
-html.portal-cleaner-active .MsoNormalTable td:last-child,
-html.portal-cleaner-active .MsoNormalTable th:last-child {
-  border-right: 1px solid var(--pc-line) !important;
-  border-top-right-radius: 12px !important;
-  border-bottom-right-radius: 12px !important;
+/* Header style for first row or th elements */
+html.portal-cleaner-active table.generaltable th,
+html.portal-cleaner-active .MsoNormalTable tr:first-child td {
+  background: var(--pc-surface-alt) !important;
+  font-weight: 700 !important;
+  color: var(--pc-muted) !important;
+  text-transform: uppercase !important;
+  font-size: 0.64rem !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 2px solid var(--pc-line) !important;
 }
 
 /* Block and Section Headers - Minimalist design matching the course list vibes */
