@@ -5,9 +5,6 @@
    structured item with clearer separation between date, lecturer, and text.
    ========================================================================== */
 
-html.portal-cleaner-active #right-column {
-  width: 240px !important;
-}
 
 html.portal-cleaner-active .block_news_items.sideblock {
   margin: 0 !important;
@@ -57,7 +54,7 @@ html.portal-cleaner-active .block_news_items .head {
 html.portal-cleaner-active .block_news_items .date {
   margin: 0 !important;
   color: var(--pc-muted) !important;
-  font-size: 0.75rem !important;
+  font-size: 0.65rem !important;
   font-style: normal !important;
   font-weight: 600 !important;
   line-height: 1.4 !important;
@@ -66,7 +63,7 @@ html.portal-cleaner-active .block_news_items .date {
 html.portal-cleaner-active .block_news_items .name {
   margin: 0 !important;
   color: var(--pc-text) !important;
-  font-size: 0.75rem !important;
+  font-size: 0.65rem !important;
   font-weight: 600 !important;
   line-height: 1.4 !important;
 }
@@ -74,7 +71,7 @@ html.portal-cleaner-active .block_news_items .name {
 html.portal-cleaner-active .block_news_items .info {
   margin: 0 !important;
   color: var(--pc-text) !important;
-  font-size: 0.75rem !important;
+  font-size: 0.65rem !important;
   line-height: 1.55 !important;
   text-align: left !important;
   white-space: normal !important;
@@ -104,5 +101,5 @@ html.portal-cleaner-active .block_news_items .footer {
   padding-top: 0.5rem !important;
   border-top: 1px solid var(--pc-line) !important;
   text-align: left !important;
-  font-size: 0.75rem !important;
+  font-size: 0.65rem !important;
 }

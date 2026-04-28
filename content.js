@@ -1,8 +1,8 @@
 const ROOT_CLASS = "portal-cleaner-active";
 const DISABLED_CLASS = "portal-cleaner-disabled";
-// These guards keep the redesign app from re-running the same setup logic if
-// the controller toggles it on more than once during a single page session.
-let pageEnhancementsApplied = false;
+// We only guard the DOMContentLoaded hook itself. The enhancement functions are
+// written to be idempotent, so rerunning them is safer than prematurely
+// deciding the page is "done" before Moodle has rendered the target nodes.
 let domReadyHookRegistered = false;
 
 // Applies a single root class so CSS can be turned on/off without touching
@@ -295,6 +295,82 @@ function enhanceNewsBlock() {
   applyNewsBlockAccessibility();
 }
 
+/**
+ * Identifies and hides table rows that are used purely for spacing (empty content).
+ * Scans for text, images, links, or inputs to ensure we don't hide functional rows.
+ */
+function removeEmptyTableRows() {
+  const tables = document.querySelectorAll(".MsoNormalTable, .generaltable");
+
+  tables.forEach((table) => {
+    const rows = Array.from(table.rows);
+
+    rows.forEach((row) => {
+      // Skip the first row as it often acts as a header
+      if (row === table.rows[0]) {
+        return;
+      }
+
+      const cells = Array.from(row.cells);
+      const isEmpty = cells.every((cell) => {
+        // Robust check for any visual or interactive elements
+        const hasInteractive = cell.querySelector("a, button, input, select, textarea, label") !== null;
+        const hasMedia = cell.querySelector("img, svg, canvas, video, audio, iframe, object, embed") !== null;
+        const hasStructural = cell.querySelector("table, ul, ol, dl") !== null;
+
+        // Check for actual text, ignoring common invisible or formatting characters
+        // includes nbsp, zero-width space, etc.
+        const cleanText = cell.textContent.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, "").trim();
+
+        return cleanText.length === 0 && !hasInteractive && !hasMedia && !hasStructural;
+      });
+
+      if (isEmpty) {
+        row.style.display = "none";
+        row.dataset.portalCleanerEmptyRow = "true";
+      }
+    });
+  });
+}
+
+/**
+ * Removes "spacer" elements (empty divs, p, br) that are commonly used in legacy
+ * content for manual padding. This allows the cleaner's CSS to take over 
+ * and provide consistent, modern spacing.
+ */
+function cleanupLegacySpacers() {
+  const containers = document.querySelectorAll(".summary, .info, .content");
+
+  containers.forEach((container) => {
+    const children = Array.from(container.children);
+
+    children.forEach((child) => {
+      // Ignore functional structural elements
+      if (child.tagName === "TABLE" || child.tagName === "UL" || child.tagName === "OL") {
+        return;
+      }
+
+      // Check for actual text content
+      const cleanText = child.textContent.replace(/[\u00A0\s\u200B-\u200D\uFEFF]/g, "").trim();
+      if (cleanText.length > 0) {
+        return;
+      }
+
+      // Check for media or interactive elements
+      if (child.querySelector("img, svg, canvas, video, audio, iframe, a, button, input")) {
+        return;
+      }
+
+      // If it's a common container tag and is now confirmed empty of meaningful content
+      const spacerTags = ["DIV", "P", "SPAN", "BR", "FONT"];
+      if (spacerTags.includes(child.tagName)) {
+        child.style.display = "none";
+        child.dataset.portalCleanerSpacer = "true";
+      }
+    });
+  });
+}
+
 // Marks the current page type on <html> so CSS can target login pages more
 // safely than relying only on broad global selectors.
 function addPageMarkers() {
@@ -371,17 +447,15 @@ function enhancePage() {
   enhanceCourseListBlock();
   enhanceNewsBlock();
   rebuildHeader();
+  removeEmptyTableRows();
+  cleanupLegacySpacers();
+  window.PortalCleanerWeekly?.enhance();
 }
 
 function ensureEnhancementsApplied() {
-  if (pageEnhancementsApplied) {
-    return;
-  }
-
-  // The current migration keeps enhancement application one-way:
-  // once the redesign has mounted for this page session 
-  // turning it off is handled by a full refresh
-  pageEnhancementsApplied = true;
+  // Re-run the enhancement pass whenever we have a good lifecycle point.
+  // Some WBLE nodes are not available yet at document_start during a reload,
+  // so the DOMContentLoaded pass needs to be allowed to try again.
   enhancePage();
 }
 

@@ -15,9 +15,10 @@
         "css/navigation.css",
         "css/courses.css",
         "css/news.css",
-        "css/login.css"
+        "css/login.css",
+        "css/weekly.css"
       ],
-      "js": ["content.js", "controller.js"],
+      "js": ["weekly.js", "content.js", "controller.js"],
       "run_at": "document_start"
     }
   ],
