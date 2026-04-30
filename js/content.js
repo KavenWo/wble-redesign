@@ -9,7 +9,7 @@
 const ROOT_CLASS = "portal-cleaner-active";
 const DISABLED_CLASS = "portal-cleaner-disabled";
 const BULK_DOWNLOAD_CONTAINER_ID = "portal-cleaner-download-panel";
-const COURSE_TOOLS_CONTAINER_ID = "portal-cleaner-course-tools";
+const MENU_CONTAINER_ID = "portal-cleaner-menu";
 const COURSE_TOOL_SOURCE_SELECTOR = ".block_participants.sideblock, .block_activity_modules.sideblock, .block_admin.sideblock";
 const COURSE_TOOL_HIDDEN_SOURCE = "utility-source";
 const COURSE_TOOL_HIDDEN_PROFILE = "profile-link";
@@ -244,7 +244,7 @@ function setupCourseToggle() {
   list.dataset.portalCleanerToggleInitialized = "true";
 }
 
-function getCourseToolIcon(label) {
+function getMenuIcon(label) {
   const normalized = label.toLowerCase();
   const icons = {
     participants: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M22 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E",
@@ -258,7 +258,7 @@ function getCourseToolIcon(label) {
   return icons[normalized] ?? icons.default;
 }
 
-function collectCourseToolLinks(sourceBlocks) {
+function collectMenuLinks(sourceBlocks) {
   const seenTargets = new Set();
   const tools = [];
 
@@ -292,23 +292,23 @@ function collectCourseToolLinks(sourceBlocks) {
   return tools;
 }
 
-function createCourseToolItem(tool) {
+function createMenuItem(tool) {
   const item = document.createElement("li");
-  item.className = "portal-cleaner-tool-item";
+  item.className = "portal-cleaner-menu-item";
 
   const link = document.createElement("a");
-  link.className = "portal-cleaner-tool-link";
+  link.className = "portal-cleaner-menu-link";
   link.href = tool.target;
 
   // The visual icon is CSS-masked so future labels can fall back gracefully
   // without depending on Moodle's old GIF assets.
   const icon = document.createElement("span");
-  icon.className = "portal-cleaner-tool-icon";
-  icon.style.setProperty("--portal-cleaner-tool-icon", `url("${getCourseToolIcon(tool.label)}")`);
+  icon.className = "portal-cleaner-menu-icon";
+  icon.style.setProperty("--portal-cleaner-menu-icon", `url("${getMenuIcon(tool.label)}")`);
   link.appendChild(icon);
 
   const title = document.createElement("span");
-  title.className = "portal-cleaner-tool-title";
+  title.className = "portal-cleaner-menu-title";
   title.textContent = tool.label;
   link.appendChild(title);
 
@@ -319,7 +319,7 @@ function createCourseToolItem(tool) {
 // Moodle can render different People, Activities, and Administration contents
 // per course. Build one right-column panel from whatever links exist today,
 // then hide the original source blocks through CSS markers.
-function enhanceCourseUtilityNavigation() {
+function enhanceMenuNavigation() {
   const rightColumn = document.querySelector("#right-column > div, #region-post > div, .side-post > div");
   const sourceBlocks = Array.from(document.querySelectorAll(COURSE_TOOL_SOURCE_SELECTOR));
 
@@ -327,12 +327,12 @@ function enhanceCourseUtilityNavigation() {
     return;
   }
 
-  const tools = collectCourseToolLinks(sourceBlocks);
+  const tools = collectMenuLinks(sourceBlocks);
   sourceBlocks.forEach((block) => {
     block.dataset.portalCleanerHidden = COURSE_TOOL_HIDDEN_SOURCE;
   });
 
-  const existingPanel = document.getElementById(COURSE_TOOLS_CONTAINER_ID);
+  const existingPanel = document.getElementById(MENU_CONTAINER_ID);
 
   if (tools.length === 0) {
     existingPanel?.setAttribute("data-portal-cleaner-hidden", COURSE_TOOL_HIDDEN_SOURCE);
@@ -344,7 +344,7 @@ function enhanceCourseUtilityNavigation() {
   }
 
   const panel = document.createElement("div");
-  panel.id = COURSE_TOOLS_CONTAINER_ID;
+  panel.id = MENU_CONTAINER_ID;
   panel.className = "portal-cleaner-utility-nav sideblock";
 
   const header = document.createElement("div");
@@ -354,7 +354,7 @@ function enhanceCourseUtilityNavigation() {
   titleWrap.className = "title";
 
   const heading = document.createElement("h2");
-  heading.textContent = "Course tools";
+  heading.textContent = "Menu";
   titleWrap.appendChild(heading);
   header.appendChild(titleWrap);
   panel.appendChild(header);
@@ -363,8 +363,8 @@ function enhanceCourseUtilityNavigation() {
   content.className = "content";
 
   const list = document.createElement("ul");
-  list.className = "portal-cleaner-tool-list list";
-  tools.forEach((tool) => list.appendChild(createCourseToolItem(tool)));
+  list.className = "portal-cleaner-menu-list list";
+  tools.forEach((tool) => list.appendChild(createMenuItem(tool)));
 
   content.appendChild(list);
   panel.appendChild(content);
@@ -391,6 +391,27 @@ function applyNewsBlockAccessibility() {
 // original anchor target in the DOM for a reversible enhancement.
 function enhanceNewsBlock() {
   const posts = document.querySelectorAll(".block_news_items.sideblock li.post");
+  const footers = document.querySelectorAll(".block_news_items.sideblock .footer");
+
+  footers.forEach((footer) => {
+    // Moodle renders the news archive footer as: <a>Older topics</a> ...
+    // The trailing ellipsis is a text node, so CSS cannot target it directly.
+    Array.from(footer.childNodes).forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE && /^[\s.]+$/.test(node.textContent ?? "")) {
+        node.textContent = "";
+      }
+    });
+  });
+
+  const archiveLinks = document.querySelectorAll(".block_news_items.sideblock .footer a");
+
+  archiveLinks.forEach((link) => {
+    const label = (link.textContent ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+
+    if (label.includes("older topics")) {
+      link.textContent = "See More";
+    }
+  });
 
   posts.forEach((post) => {
     if (post.dataset.portalCleanerEnhanced === "true") {
@@ -740,7 +761,7 @@ function enhancePage() {
   normalizeLoginChrome();
   simplifyLoginContent();
   enhanceCourseListBlock();
-  enhanceCourseUtilityNavigation();
+  enhanceMenuNavigation();
   enhanceNewsBlock();
   rebuildHeader();
   removeEmptyTableRows();

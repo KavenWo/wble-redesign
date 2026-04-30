@@ -21,26 +21,27 @@ html.portal-cleaner-active .block_news_items .unlist {
 }
 
 html.portal-cleaner-active .block_news_items li.post {
-  margin: 0 0 0.75rem !important;
-  padding: 0.65rem 0.75rem !important;
-  border: 1px solid var(--pc-line) !important;
+  margin: 0 !important;
+  padding: 0.55rem 0.5rem !important;
+  border: 1px solid transparent !important;
+  border-bottom-color: rgba(148, 163, 184, 0.22) !important;
   border-radius: 10px !important;
-  background: var(--pc-surface) !important;
-  box-shadow: var(--pc-shadow) !important;
+  background: transparent !important;
+  box-shadow: none !important;
   cursor: pointer !important;
   transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease !important;
 }
 
 html.portal-cleaner-active .block_news_items li.post:last-child {
-  margin-bottom: 0 !important;
+  border-bottom-color: transparent !important;
 }
 
 html.portal-cleaner-active .block_news_items li.post:hover,
 html.portal-cleaner-active .block_news_items li.post:focus-visible {
-  border-color: var(--pc-primary) !important;
-  background: var(--pc-primary-soft) !important;
-  box-shadow: 0 10px 20px -14px rgba(37, 99, 235, 0.55) !important;
-  transform: translateY(-1px) !important;
+  border-color: var(--pc-line) !important;
+  background: var(--pc-surface) !important;
+  box-shadow: var(--pc-shadow) !important;
+  transform: translateX(2px) !important;
   outline: none !important;
 }
 
@@ -79,12 +80,6 @@ html.portal-cleaner-active .block_news_items .info {
   overflow-wrap: anywhere !important;
 }
 
-html.portal-cleaner-active .block_news_items li.post[data-portal-cleaner-enhanced="true"] .info::after {
-  content: " ..." !important;
-  color: var(--pc-primary) !important;
-  font-weight: 600 !important;
-}
-
 html.portal-cleaner-active .block_news_items .info a:not(.portal-cleaner-original-content) {
   display: inline !important;
   margin-left: 0.25rem !important;
@@ -97,9 +92,38 @@ html.portal-cleaner-active .block_news_items .info a.portal-cleaner-original-con
 }
 
 html.portal-cleaner-active .block_news_items .footer {
-  margin-top: 0.6rem !important;
-  padding-top: 0.5rem !important;
-  border-top: 1px solid var(--pc-line) !important;
-  text-align: left !important;
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 0 !important;
+  padding: 0.2rem 0.5rem 0 !important;
+  border-top: none !important;
+  text-align: center !important;
   font-size: 0.65rem !important;
+}
+
+/* Moodle renders the archive link as plain footer text. Treat it like a quiet
+   navigation affordance so it belongs with the compact course/menu cards. */
+html.portal-cleaner-active .block_news_items .footer a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center;
+  min-height: 1.5rem !important;
+  padding: 0.25rem 0.45rem !important;
+  border-radius: 8px !important;
+  color: var(--pc-muted) !important;
+  font-size: 0.6rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  transition: color 150ms ease, background-color 150ms ease, transform 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+html.portal-cleaner-active .block_news_items .footer a:hover,
+html.portal-cleaner-active .block_news_items .footer a:focus-visible {
+  color: var(--pc-primary) !important;
+  background: var(--pc-primary-soft) !important;
+  transform: translateX(2px) !important;
+  outline: none !important;
 }

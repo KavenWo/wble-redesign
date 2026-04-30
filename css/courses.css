@@ -19,6 +19,20 @@ html.portal-cleaner-active .block_course_list.sideblock .content {
   padding: 0.5rem !important;
 }
 
+/* Keep the course selector available while reading long weekly pages. The
+   sticky behavior belongs on the column's inner wrapper rather than the legacy
+   table cell, which is less predictable across Moodle's old table layout. */
+@media (min-width: 900px) {
+  html.portal-cleaner-active #left-column > div,
+  html.portal-cleaner-active .side-pre > div {
+    position: sticky !important;
+    top: 0.75rem !important;
+    max-height: calc(100vh - 1.5rem) !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+  }
+}
+
 /* Hide legacy icons and columns when active */
 html.portal-cleaner-active .block_course_list.sideblock .column.c0 {
   display: none !important;

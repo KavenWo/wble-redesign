@@ -18,6 +18,7 @@ html.portal-cleaner-active #center-column .weeks {
 html.portal-cleaner-active #middle-column .headingblock.header.outline,
 html.portal-cleaner-active #center-column .headingblock.header.outline,
 html.portal-cleaner-active tr.section.separator,
+html.portal-cleaner-active tr.section.main[id^="section-"] > td.left.side,
 html.portal-cleaner-active tr.section.main[id^="section-"] > td.right.side,
 html.portal-cleaner-active tr.section.main[id^="section-"] > td.right.side .icon.wkone,
 html.portal-cleaner-active tr.section.main[id^="section-"] > td.right.side a[title*="Show only week"] {
