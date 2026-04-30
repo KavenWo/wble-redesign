@@ -1,0 +1,214 @@
+/* ==========================================================================
+   Calendar Module
+   ==========================================================================
+   Redesigns Moodle's sidebar mini calendar into a cleaner, compact monthly
+   view that matches the portal theme. Handles month navigation, day cells,
+   event indicators, and today/weekend states without changing Moodle's DOM.
+   ========================================================================== */
+
+/* Give the month block a self-contained panel treatment while keeping the
+   global sideblock layout from layout.css responsible for outer spacing. */
+html.portal-cleaner-active .block_calendar_month.sideblock {
+  padding: 0 0.85rem 0.85rem !important;
+}
+
+html.portal-cleaner-active .block_calendar_month.sideblock .content {
+  padding: 0.25rem 0 0 !important;
+}
+
+/* Month navigation becomes a compact toolbar so previous/current/next controls
+   are easy to scan in the narrow right sidebar. */
+html.portal-cleaner-active .block_calendar_month .calendar-controls {
+  display: grid !important;
+  grid-template-columns: 2rem minmax(0, 1fr) 2rem !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  margin: 0.15rem 0 0.55rem !important;
+  padding: 0.3rem !important;
+  background: var(--pc-surface) !important;
+  border: 1px solid var(--pc-line) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--pc-shadow) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .hide,
+html.portal-cleaner-active .block_calendar_month .calendar-controls .clearer,
+html.portal-cleaner-active .block_calendar_month .calendar-controls .accesshide {
+  display: none !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .previous,
+html.portal-cleaner-active .block_calendar_month .calendar-controls .next {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  border-radius: 8px !important;
+  color: var(--pc-muted) !important;
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .previous:hover,
+html.portal-cleaner-active .block_calendar_month .calendar-controls .next:hover {
+  background: var(--pc-primary-soft) !important;
+  color: var(--pc-primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .arrow {
+  font-size: 0 !important;
+  line-height: 1 !important;
+}
+
+/* Replace legacy encoded triangle text with crisp CSS arrows that do not rely
+   on the scraped page's character encoding being correct. */
+html.portal-cleaner-active .block_calendar_month .calendar-controls .previous .arrow::before,
+html.portal-cleaner-active .block_calendar_month .calendar-controls .next .arrow::before {
+  content: "" !important;
+  display: block !important;
+  width: 0.5rem !important;
+  height: 0.5rem !important;
+  border-color: currentColor !important;
+  border-style: solid !important;
+  transform: rotate(45deg) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .previous .arrow::before {
+  border-width: 0 0 2px 2px !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .next .arrow::before {
+  border-width: 2px 2px 0 0 !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .current {
+  min-width: 0 !important;
+  text-align: center !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .calendar-controls .current a {
+  display: block !important;
+  overflow: hidden !important;
+  color: var(--pc-text) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Mini calendar grid: fixed table layout keeps every day aligned and prevents
+   event links or Moodle classes from stretching the sidebar. */
+html.portal-cleaner-active .block_calendar_month table.minicalendar {
+  width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: separate !important;
+  border-spacing: 0.18rem !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar th,
+html.portal-cleaner-active .block_calendar_month .minicalendar td {
+  width: 14.285% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar th {
+  height: 1.25rem !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar th abbr {
+  border: 0 !important;
+  color: var(--pc-muted) !important;
+  cursor: default !important;
+  display: block !important;
+  font-size: 0.52rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  text-transform: uppercase !important;
+}
+
+/* Day cells use a stable square footprint so hover, event, and today states do
+   not cause layout shift inside the compact sidebar calendar. */
+html.portal-cleaner-active .block_calendar_month .minicalendar td {
+  position: relative !important;
+  height: 1.75rem !important;
+  border-radius: 8px !important;
+  color: var(--pc-text) !important;
+  font-size: 0.68rem !important;
+  font-weight: 650 !important;
+  line-height: 1 !important;
+  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td.dayblank {
+  color: transparent !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td.weekend:not(.dayblank) {
+  color: #dc2626 !important;
+  background: #fff7f7 !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td.day:hover,
+html.portal-cleaner-active .block_calendar_month .minicalendar td.weekend:hover {
+  background: var(--pc-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--pc-line) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* Moodle event classes vary by calendar source. Match every event_* class so
+   course, user, group, and site events share the same readable treatment. */
+html.portal-cleaner-active .block_calendar_month .minicalendar td[class*="event_"] {
+  background: var(--pc-primary-soft) !important;
+  color: var(--pc-primary-strong) !important;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.16) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td[class*="event_"]::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 0.22rem !important;
+  width: 0.22rem !important;
+  height: 0.22rem !important;
+  border-radius: 999px !important;
+  background: var(--pc-primary) !important;
+  transform: translateX(-50%) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td[class*="event_"]:hover {
+  background: #dbeafe !important;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.28) !important;
+}
+
+/* Moodle can mark the current day with either .today or .day.today depending
+   on page version; the rule is intentionally broad inside the calendar block. */
+html.portal-cleaner-active .block_calendar_month .minicalendar td.today {
+  background: var(--pc-primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td.today::after {
+  background: #ffffff !important;
+}
+
