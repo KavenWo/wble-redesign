@@ -1,3 +1,11 @@
+/* ==========================================================================
+   Popup Module
+   ==========================================================================
+   Powers the extension popup toggle. It loads the saved cleaner state,
+   persists user changes, and notifies the background worker so the current
+   WBLE tab can react immediately.
+   ========================================================================== */
+
 const STORAGE_KEY = "cleanerEnabled";
 const toggle = document.getElementById("toggleCleaner");
 

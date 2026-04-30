@@ -1,3 +1,11 @@
+/* ==========================================================================
+   Controller Module
+   ==========================================================================
+   Bridges saved extension preferences with the page runtime. It reads the
+   persisted cleaner toggle, starts the content app when needed, and listens
+   for live enable events sent from the background worker.
+   ========================================================================== */
+
 const STORAGE_KEY = "cleanerEnabled";
 
 // This file is intentionally small: it acts as the runtime controller that

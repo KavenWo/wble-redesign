@@ -1,5 +1,18 @@
+/* ==========================================================================
+   Content Module
+   ==========================================================================
+   Boots the page-side redesign experience on WBLE. It manages root state,
+   login-page cleanup, and the DOM enhancements that reshape the portal UI
+   once the cleaner mode is active.
+   ========================================================================== */
+
 const ROOT_CLASS = "portal-cleaner-active";
 const DISABLED_CLASS = "portal-cleaner-disabled";
+const BULK_DOWNLOAD_CONTAINER_ID = "portal-cleaner-download-panel";
+const COURSE_TOOLS_CONTAINER_ID = "portal-cleaner-course-tools";
+const COURSE_TOOL_SOURCE_SELECTOR = ".block_participants.sideblock, .block_activity_modules.sideblock, .block_admin.sideblock";
+const COURSE_TOOL_HIDDEN_SOURCE = "utility-source";
+const COURSE_TOOL_HIDDEN_PROFILE = "profile-link";
 // We only guard the DOMContentLoaded hook itself. The enhancement functions are
 // written to be idempotent, so rerunning them is safer than prematurely
 // deciding the page is "done" before Moodle has rendered the target nodes.
@@ -231,6 +244,133 @@ function setupCourseToggle() {
   list.dataset.portalCleanerToggleInitialized = "true";
 }
 
+function getCourseToolIcon(label) {
+  const normalized = label.toLowerCase();
+  const icons = {
+    participants: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M22 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E",
+    assignments: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3Crect x='8' y='2' width='8' height='4' rx='1'/%3E%3Cpath d='M9 14l2 2 4-4'/%3E%3C/svg%3E",
+    forums: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z'/%3E%3C/svg%3E",
+    resources: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M16 13H8'/%3E%3Cpath d='M16 17H8'/%3E%3C/svg%3E",
+    grades: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3v18h18'/%3E%3Cpath d='M18 17V9'/%3E%3Cpath d='M13 17V5'/%3E%3Cpath d='M8 17v-3'/%3E%3C/svg%3E",
+    default: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.75 6.75A2.75 2.75 0 0 1 7.5 4h9A2.75 2.75 0 0 1 19.25 6.75v10.5A2.75 2.75 0 0 1 16.5 20h-9a2.75 2.75 0 0 1-2.75-2.75V6.75Z'/%3E%3Cpath d='M8.5 8.25h7M8.5 12h7M8.5 15.75h4.5'/%3E%3C/svg%3E"
+  };
+
+  return icons[normalized] ?? icons.default;
+}
+
+function collectCourseToolLinks(sourceBlocks) {
+  const seenTargets = new Set();
+  const tools = [];
+
+  sourceBlocks.forEach((block) => {
+    const links = block.querySelectorAll(".content .list a[href]");
+
+    links.forEach((link) => {
+      const label = (link.textContent ?? "").replace(/\s+/g, " ").trim();
+
+      if (!label) {
+        return;
+      }
+
+      if (label.toLowerCase() === "profile") {
+        link.closest("li")?.setAttribute("data-portal-cleaner-hidden", COURSE_TOOL_HIDDEN_PROFILE);
+        return;
+      }
+
+      const target = link.href;
+      const dedupeKey = `${label.toLowerCase()}|${target}`;
+
+      if (seenTargets.has(dedupeKey)) {
+        return;
+      }
+
+      seenTargets.add(dedupeKey);
+      tools.push({ label, target });
+    });
+  });
+
+  return tools;
+}
+
+function createCourseToolItem(tool) {
+  const item = document.createElement("li");
+  item.className = "portal-cleaner-tool-item";
+
+  const link = document.createElement("a");
+  link.className = "portal-cleaner-tool-link";
+  link.href = tool.target;
+
+  // The visual icon is CSS-masked so future labels can fall back gracefully
+  // without depending on Moodle's old GIF assets.
+  const icon = document.createElement("span");
+  icon.className = "portal-cleaner-tool-icon";
+  icon.style.setProperty("--portal-cleaner-tool-icon", `url("${getCourseToolIcon(tool.label)}")`);
+  link.appendChild(icon);
+
+  const title = document.createElement("span");
+  title.className = "portal-cleaner-tool-title";
+  title.textContent = tool.label;
+  link.appendChild(title);
+
+  item.appendChild(link);
+  return item;
+}
+
+// Moodle can render different People, Activities, and Administration contents
+// per course. Build one right-column panel from whatever links exist today,
+// then hide the original source blocks through CSS markers.
+function enhanceCourseUtilityNavigation() {
+  const rightColumn = document.querySelector("#right-column > div, #region-post > div, .side-post > div");
+  const sourceBlocks = Array.from(document.querySelectorAll(COURSE_TOOL_SOURCE_SELECTOR));
+
+  if (!rightColumn || sourceBlocks.length === 0) {
+    return;
+  }
+
+  const tools = collectCourseToolLinks(sourceBlocks);
+  sourceBlocks.forEach((block) => {
+    block.dataset.portalCleanerHidden = COURSE_TOOL_HIDDEN_SOURCE;
+  });
+
+  const existingPanel = document.getElementById(COURSE_TOOLS_CONTAINER_ID);
+
+  if (tools.length === 0) {
+    existingPanel?.setAttribute("data-portal-cleaner-hidden", COURSE_TOOL_HIDDEN_SOURCE);
+    return;
+  }
+
+  if (existingPanel) {
+    return;
+  }
+
+  const panel = document.createElement("div");
+  panel.id = COURSE_TOOLS_CONTAINER_ID;
+  panel.className = "portal-cleaner-utility-nav sideblock";
+
+  const header = document.createElement("div");
+  header.className = "header";
+
+  const titleWrap = document.createElement("div");
+  titleWrap.className = "title";
+
+  const heading = document.createElement("h2");
+  heading.textContent = "Course tools";
+  titleWrap.appendChild(heading);
+  header.appendChild(titleWrap);
+  panel.appendChild(header);
+
+  const content = document.createElement("div");
+  content.className = "content";
+
+  const list = document.createElement("ul");
+  list.className = "portal-cleaner-tool-list list";
+  tools.forEach((tool) => list.appendChild(createCourseToolItem(tool)));
+
+  content.appendChild(list);
+  panel.appendChild(content);
+  rightColumn.prepend(panel);
+}
+
 // Once the redesign app enhances a news block, it treats the card behavior
 // as permanently active for that page session. 
 // Turning the extension off, causes a full page refresh.
@@ -436,6 +576,161 @@ function rebuildHeader() {
   header.appendChild(newHeader);
 }
 
+function updateBulkDownloadStatus(panel, message, tone) {
+  const status = panel?.querySelector(".portal-cleaner-download-status");
+
+  if (!status) {
+    return;
+  }
+
+  status.textContent = message;
+  status.dataset.portalCleanerTone = tone ?? "neutral";
+}
+
+function triggerZipDownload(blob, courseFolderName) {
+  const archiveBaseName =
+    window.PortalCleanerResourceDiscovery?.slugifyPathSegment(courseFolderName, "Course Files") ??
+    "Course Files";
+  const downloadLink = document.createElement("a");
+  const objectUrl = URL.createObjectURL(blob);
+
+  downloadLink.href = objectUrl;
+  downloadLink.download = `${archiveBaseName}.zip`;
+  downloadLink.style.display = "none";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  downloadLink.remove();
+
+  window.setTimeout(() => {
+    URL.revokeObjectURL(objectUrl);
+  }, 1000);
+}
+
+// Render one additive bulk-download panel near the weekly resources without
+// disturbing the original Moodle markup underneath.
+function renderBulkDownloadPanel(discovery) {
+  const firstWeekContent = document.querySelector('tr.section.main[id^="section-"] > td.content');
+
+  if (!firstWeekContent) {
+    return;
+  }
+
+  let panel = document.getElementById(BULK_DOWNLOAD_CONTAINER_ID);
+
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.id = BULK_DOWNLOAD_CONTAINER_ID;
+    panel.className = "portal-cleaner-download-panel";
+
+    const textWrap = document.createElement("div");
+    textWrap.className = "portal-cleaner-download-copy";
+
+    const title = document.createElement("h3");
+    title.className = "portal-cleaner-download-title";
+    title.textContent = "Bulk download";
+    textWrap.appendChild(title);
+
+    const description = document.createElement("p");
+    description.className = "portal-cleaner-download-description";
+    textWrap.appendChild(description);
+
+    const actions = document.createElement("div");
+    actions.className = "portal-cleaner-download-actions";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "portal-cleaner-download-button";
+    button.textContent = "Download all files";
+    actions.appendChild(button);
+
+    const status = document.createElement("p");
+    status.className = "portal-cleaner-download-status";
+    status.setAttribute("aria-live", "polite");
+    actions.appendChild(status);
+
+    panel.appendChild(textWrap);
+    panel.appendChild(actions);
+    firstWeekContent.prepend(panel);
+  }
+
+  const description = panel.querySelector(".portal-cleaner-download-description");
+  const button = panel.querySelector(".portal-cleaner-download-button");
+
+  if (!description || !(button instanceof HTMLButtonElement)) {
+    return;
+  }
+
+  const downloadableCount = discovery.downloadable.length;
+  const skippedCount = discovery.skipped.length;
+  description.textContent = downloadableCount > 0
+    ? `Package ${downloadableCount} course file${downloadableCount === 1 ? "" : "s"} into one ZIP download. ${skippedCount > 0 ? `${skippedCount} non-file link${skippedCount === 1 ? " was" : "s were"} skipped.` : ""}`
+    : `No downloadable course files were found on this page. ${skippedCount > 0 ? `${skippedCount} non-file link${skippedCount === 1 ? " was" : "s were"} skipped.` : ""}`;
+
+  button.disabled = downloadableCount === 0;
+
+  if (panel.dataset.portalCleanerDownloadBound === "true") {
+    return;
+  }
+
+  panel.dataset.portalCleanerDownloadBound = "true";
+
+  button.addEventListener("click", async () => {
+    if (button.disabled) {
+      return;
+    }
+
+    button.disabled = true;
+    updateBulkDownloadStatus(panel, `Packaging ${discovery.downloadable.length} file${discovery.downloadable.length === 1 ? "" : "s"} into one ZIP...`, "neutral");
+
+    try {
+      const response = await window.PortalCleanerZipBuilder?.buildArchive(discovery.downloadable);
+
+      if (!response) {
+        updateBulkDownloadStatus(panel, "ZIP builder is not available on this page.", "error");
+        return;
+      }
+
+      if (!response.ok) {
+        const failedCount = response?.results?.filter((result) => !result.ok).length ?? 0;
+        const failureContext = failedCount > 0 ? ` ${failedCount} file request${failedCount === 1 ? "" : "s"} failed.` : "";
+        updateBulkDownloadStatus(panel, `ZIP download could not be created.${failureContext}`, "error");
+        return;
+      }
+
+      triggerZipDownload(response.blob, discovery.courseFolderName);
+      const successCount = response.results.filter((result) => result.ok).length;
+      const failureCount = response.results.length - successCount;
+      const archiveName = `${discovery.courseFolderName}.zip`;
+      const suffix = failureCount > 0 ? ` ${failureCount} file${failureCount === 1 ? "" : "s"} could not be added.` : "";
+      updateBulkDownloadStatus(panel, `${successCount} file${successCount === 1 ? "" : "s"} packed into ${archiveName}.${suffix}`, failureCount > 0 ? "warning" : "success");
+    } catch (error) {
+      updateBulkDownloadStatus(panel, `ZIP download failed: ${error instanceof Error ? error.message : "unknown error"}.`, "error");
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+// Discovery stays outside content.js so future selection UI can reuse the same
+// resource classification rules without duplicating DOM parsing logic here.
+function enhanceBulkDownloadTools() {
+  if (document.documentElement.dataset.portalCleanerPage !== "portal") {
+    return;
+  }
+
+  if (!window.PortalCleanerResourceDiscovery) {
+    return;
+  }
+
+  const discovery = window.PortalCleanerResourceDiscovery.discoverDownloadableResources();
+
+  if (discovery.downloadable.length === 0 && discovery.skipped.length === 0) {
+    return;
+  }
+
+  renderBulkDownloadPanel(discovery);
+}
+
 // Central hook for lightweight page-specific enhancements. Keep this as the
 // single place that wires together per-page UI upgrades.
 function enhancePage() {
@@ -445,11 +740,13 @@ function enhancePage() {
   normalizeLoginChrome();
   simplifyLoginContent();
   enhanceCourseListBlock();
+  enhanceCourseUtilityNavigation();
   enhanceNewsBlock();
   rebuildHeader();
   removeEmptyTableRows();
   cleanupLegacySpacers();
   window.PortalCleanerWeekly?.enhance();
+  enhanceBulkDownloadTools();
 }
 
 function ensureEnhancementsApplied() {
