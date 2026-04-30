@@ -90,6 +90,53 @@ html.portal-cleaner-active #region-post {
   margin: 0 !important;
 }
 
+html.portal-cleaner-active #right-column > div,
+html.portal-cleaner-active #region-post > div,
+html.portal-cleaner-active .side-post > div {
+  gap: 0.3rem !important;
+}
+
+html.portal-cleaner-active #right-column .sideblock,
+html.portal-cleaner-active #region-post .sideblock,
+html.portal-cleaner-active .side-post .sideblock {
+  margin: 0 !important;
+  padding: 0 1rem !important;
+}
+
+html.portal-cleaner-active #right-column .sideblock .header,
+html.portal-cleaner-active #region-post .sideblock .header,
+html.portal-cleaner-active .side-post .sideblock .header {
+  padding: 0.35rem 0.5rem 0.15rem !important;
+}
+
+html.portal-cleaner-active #right-column .sideblock .content,
+html.portal-cleaner-active #region-post .sideblock .content,
+html.portal-cleaner-active .side-post .sideblock .content {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.35rem !important;
+}
+
+/* Moodle inserts "Skip block" accessibility anchors between sidebar blocks.
+   In the redesigned sidebars the block order is handled visually, and these
+   anchors become flex items that can create phantom gaps between sections. */
+html.portal-cleaner-active #left-column .skip-block,
+html.portal-cleaner-active #left-column .skip-block-to,
+html.portal-cleaner-active #right-column .skip-block,
+html.portal-cleaner-active #right-column .skip-block-to,
+html.portal-cleaner-active .side-pre .skip-block,
+html.portal-cleaner-active .side-pre .skip-block-to,
+html.portal-cleaner-active .side-post .skip-block,
+html.portal-cleaner-active .side-post .skip-block-to {
+  display: none !important;
+}
+
+/* Home-page cleanup: these Moodle blocks add noise without useful navigation
+   or course context in the redesigned right column. */
+html.portal-cleaner-active .block_online_users.sideblock,
+html.portal-cleaner-active .block_course_summary.sideblock {
+  display: none !important;
+}
+
 html.portal-cleaner-active #page {
   width: 100% !important;
   margin: 0 !important;

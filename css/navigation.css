@@ -1,9 +1,9 @@
 /* ==========================================================================
-   Navigation & Breadcrumbs Module
+   Navigation Reset Module
    ==========================================================================
    Aggressively strips legacy table-based "capsule" styles from all breadcrumb 
    and navigation containers, integrating them seamlessly into the page 
-   background as "plain words".
+   background so dedicated modules can rebuild the final presentation.
    ========================================================================== */
 
 /* Aggressive reset for all breadcrumb variants */
@@ -56,79 +56,4 @@ html.portal-cleaner-active table[background*="navbar_bg.gif"],
 html.portal-cleaner-active table[background*="/theme/wble/navbar_bg.gif"] {
   background: transparent !important;
   background-image: none !important;
-}
-
-/* Integrated Navigation UI
-   The breadcrumb should read as the top edge of the content surface, not as a
-   continuation of the header. */
-html.portal-cleaner-active .navbar {
-  margin-bottom: 0 !important;
-  width: 90% !important;
-  margin-left: 5% !important;
-  min-height: auto !important;
-  display: block !important;
-  background: var(--pc-surface) !important;
-  background-color: var(--pc-surface) !important;
-  border: 1px solid var(--pc-line) !important;
-  border-bottom: none !important;
-  border-top-left-radius: var(--pc-radius) !important;
-  border-top-right-radius: var(--pc-radius) !important;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  box-shadow: var(--pc-shadow) !important;
-  padding: 0.8rem 1.1rem !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-html.portal-cleaner-active table.navbar {
-  position: relative !important;
-  z-index: 2 !important;
-}
-
-html.portal-cleaner-active .navtrail,
-html.portal-cleaner-active .navigation {
-  margin: 0 auto 0.5rem !important;
-  width: 90% !important;
-  padding: 0 !important;
-}
-
-html.portal-cleaner-active .breadcrumb ul {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  align-items: center !important;
-  list-style: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  gap: 0.2rem !important;
-}
-
-html.portal-cleaner-active .breadcrumb li {
-  display: flex !important;
-  align-items: center !important;
-  font-size: 0.65rem !important;
-  font-weight: 500 !important;
-  color: var(--pc-muted) !important;
-}
-
-html.portal-cleaner-active .breadcrumb li a {
-  color: var(--pc-text) !important;
-  text-decoration: none !important;
-  transition: color 150ms ease !important;
-}
-
-html.portal-cleaner-active .breadcrumb li a:hover {
-  color: var(--pc-primary) !important;
-  text-decoration: underline !important;
-}
-
-html.portal-cleaner-active .breadcrumb .sep {
-  margin: 0 0.25rem !important;
-  color: var(--pc-line) !important;
-  font-size: 0.5rem !important;
-  font-style: normal !important;
-}
-
-html.portal-cleaner-active .breadcrumb .accesshide {
-  display: none !important;
 }

@@ -556,6 +556,13 @@ function rebuildHeader() {
   const profileUrl = links[0].href;
   const userName = links[0].textContent?.trim() ?? "";
   const logoutUrl = links[1].href;
+  const initials = userName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
 
   const newHeader = document.createElement("div");
   newHeader.className = "portal-cleaner-header-new";
@@ -577,20 +584,65 @@ function rebuildHeader() {
   const userActions = document.createElement("div");
   userActions.className = "portal-cleaner-header-actions";
 
-  const nameLink = document.createElement("a");
-  nameLink.href = profileUrl;
-  nameLink.className = "portal-cleaner-header-name";
-  nameLink.textContent = userName;
-  userActions.appendChild(nameLink);
+  const nameText = document.createElement("span");
+  nameText.className = "portal-cleaner-header-name";
+  nameText.textContent = userName;
+  userActions.appendChild(nameText);
 
-  const logoutBtn = document.createElement("a");
-  logoutBtn.href = logoutUrl;
-  logoutBtn.className = "portal-cleaner-header-logout";
-  logoutBtn.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-    Logout
-  `;
-  userActions.appendChild(logoutBtn);
+  const menuWrap = document.createElement("div");
+  menuWrap.className = "portal-cleaner-profile-menu";
+
+  const menuButton = document.createElement("button");
+  menuButton.type = "button";
+  menuButton.className = "portal-cleaner-profile-trigger";
+  menuButton.setAttribute("aria-label", "Open user menu");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.textContent = initials || "U";
+  menuWrap.appendChild(menuButton);
+
+  const menu = document.createElement("div");
+  menu.className = "portal-cleaner-profile-dropdown";
+  menu.setAttribute("role", "menu");
+
+  const profileLink = document.createElement("a");
+  profileLink.href = profileUrl;
+  profileLink.className = "portal-cleaner-profile-menu-item";
+  profileLink.setAttribute("role", "menuitem");
+  profileLink.textContent = "Profile";
+  menu.appendChild(profileLink);
+
+  const logoutLink = document.createElement("a");
+  logoutLink.href = logoutUrl;
+  logoutLink.className = "portal-cleaner-profile-menu-item portal-cleaner-profile-menu-item-danger";
+  logoutLink.setAttribute("role", "menuitem");
+  logoutLink.textContent = "Log Out";
+  menu.appendChild(logoutLink);
+
+  menuWrap.appendChild(menu);
+  userActions.appendChild(menuWrap);
+
+  const closeMenu = () => {
+    menuWrap.classList.remove("is-open");
+    menuButton.setAttribute("aria-expanded", "false");
+  };
+
+  menuButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const isOpen = menuWrap.classList.toggle("is-open");
+    menuButton.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!menuWrap.contains(event.target)) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+  });
 
   container.appendChild(userActions);
   newHeader.appendChild(container);
