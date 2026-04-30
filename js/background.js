@@ -1,3 +1,11 @@
+/* ==========================================================================
+   Background Module
+   ==========================================================================
+   Coordinates extension-wide toggle behavior from the service worker. It
+   decides whether the active WBLE tab should refresh or receive a live
+   enable message when the popup state changes.
+   ========================================================================== */
+
 function isWbleTab(tab) {
   return typeof tab?.url === "string" && tab.url.startsWith("https://ewble-sl.utar.edu.my/");
 }

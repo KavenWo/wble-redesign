@@ -1,3 +1,11 @@
+/* ==========================================================================
+   Weekly Module
+   ==========================================================================
+   Restructures the weekly course outline into a cleaner, easier-to-scan
+   layout. It parses Moodle week rows, summarizes their content, and supports
+   the weekly experience used by the redesigned portal view.
+   ========================================================================== */
+
 function getWeeklyOutlineRows() {
   return Array.from(document.querySelectorAll('tr.section.main[id^="section-"]'));
 }

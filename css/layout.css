@@ -27,6 +27,14 @@ html.portal-cleaner-active #content {
   border: none !important;
   box-shadow: none !important;
   overflow-x: clip !important;
+  margin-bottom: 5rem !important;
+}
+
+/* The legacy Moodle footer repeats login/logout state that already exists in
+   the redesigned header. Hide the whole footer so pages end at their content
+   with only a small intentional bottom margin from #content. */
+html.portal-cleaner-active #footer {
+  display: none !important;
 }
 
 /* Global reset to prevent padding/borders from expanding widths */
@@ -37,22 +45,27 @@ html.portal-cleaner-active *::after {
 }
 
 /* Sidebar structure - Converted to Flexbox for robust 100% width management */
+html.portal-cleaner-active #layout-table {
+  border-collapse: separate !important;
+  border-spacing: 0.25rem 0 !important;
+}
+
 html.portal-cleaner-active #region-post-box {
   display: flex !important;
   flex-direction: row !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow: hidden !important;
-  gap: 0 !important; /* Spacing handled by column padding */
+  gap: 0.25rem !important;
 }
 
 html.portal-cleaner-active #left-column,
 html.portal-cleaner-active #region-pre {
-  width: clamp(180px, 18vw, 240px) !important;
-  min-width: 180px !important;
-  flex: 0 1 clamp(180px, 18vw, 240px) !important;
+  width: clamp(220px, 19vw, 250px) !important;
+  min-width: 220px !important;
+  flex: 0 1 clamp(220px, 19vw, 250px) !important;
   order: 1 !important;
-  padding-right: 0.1rem !important; /* Reduced gutter */
+  padding: 0 !important;
   margin: 0 !important;
 }
 
@@ -69,11 +82,11 @@ html.portal-cleaner-active #center-column {
 
 html.portal-cleaner-active #right-column,
 html.portal-cleaner-active #region-post {
-  width: clamp(180px, 18vw, 240px) !important;
-  min-width: 180px !important;
-  flex: 0 1 clamp(180px, 18vw, 240px) !important;
+  width: clamp(220px, 19vw, 250px) !important;
+  min-width: 220px !important;
+  flex: 0 1 clamp(220px, 19vw, 250px) !important;
   order: 3 !important;
-  padding-left: 0.1rem !important; /* Reduced gutter */
+  padding: 0 !important;
   margin: 0 !important;
 }
 
@@ -110,9 +123,11 @@ html.portal-cleaner-active .frontpage-course-list {
 
 html.portal-cleaner-active .course-content {
   padding-top: 0.75rem !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   border-top: none !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
+  border-radius: 0 !important;
 }
 
 /* Table beautification - Scoped to real data tables */
