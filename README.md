@@ -55,6 +55,7 @@ To keep the redesign flexible while preserving confidence in the original Moodle
 3. **Controller and redesign logic are separate**:
    - `controller.js` reads the saved toggle state and decides whether the redesign app should run.
    - `content.js` contains the redesign behavior itself.
+   - `file-tools.js` and `css/file-tools.css` own the course files pill, modal, ZIP action, and OneDrive conversion UI.
    - `background.js` handles the tab refresh flow when the user disables the redesign from the popup.
 4. **Page-load state is the source of truth**:
    - If the redesign is off when the page loads, the redesign app does not mount.

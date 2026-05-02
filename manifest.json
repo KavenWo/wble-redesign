@@ -23,13 +23,15 @@
         "css/menu.css",
         "css/news.css",
         "css/login.css",
-        "css/weekly.css"
+        "css/weekly.css",
+        "css/file-tools.css"
       ],
       "js": [
         "js/resource-discovery.js",
         "js/zip-builder.js",
         "js/onedrive-auth.js",
         "js/onedrive-converter.js",
+        "js/file-tools.js",
         "js/weekly.js",
         "js/content.js",
         "js/controller.js"

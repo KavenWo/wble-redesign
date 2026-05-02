@@ -18,25 +18,24 @@
     });
   }
 
+  // Converts discovery's display format into the real extension Microsoft
+  // Graph needs in order to recognize the uploaded item as a PowerPoint file.
   function normalizeExtension(format) {
-    // Resource discovery stores formats as labels. Keep the real file extension
-    // explicit because Graph conversion depends on OneDrive recognizing the
-    // uploaded item as a PowerPoint file.
     const normalized = String(format ?? "").toLowerCase();
     return normalized === "ppt" ? "ppt" : "pptx";
   }
 
+  // Adds entropy to temporary OneDrive filenames so repeated conversions of
+  // similarly named lecture decks cannot overwrite each other.
   function createJobId() {
-    // Temporary OneDrive filenames include entropy so repeated conversions of
-    // similarly named lecture decks cannot overwrite each other.
     const bytes = new Uint8Array(8);
     crypto.getRandomValues(bytes);
     return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
   }
 
+  // Creates a safe local source filename before upload. This reuses discovery's
+  // filename rules so PDFs match the archive names students already see.
   function sanitizeFileName(title, format, index) {
-    // Reuse the resource-discovery filename rules so downloaded PDFs match the
-    // existing ZIP names students already see.
     const fallback = `slides-${index + 1}`;
     const extension = normalizeExtension(format);
     const safeTitle = window.PortalCleanerResourceDiscovery?.slugifyPathSegment(title, fallback) ?? fallback;
@@ -49,16 +48,15 @@
     return sourceFileName.replace(/\.(pptx?|pdf)$/iu, "") + ".pdf";
   }
 
+  // Creates the temporary filename used in OneDrive. It is intentionally more
+  // unique than the final PDF name because it only exists in the app folder.
   function createGraphPathFileName(sourceFileName) {
-    // The Graph-facing name is intentionally more unique than the final local
-    // PDF name because it only exists briefly in the student's OneDrive app
-    // folder.
     return `wble-${Date.now()}-${createJobId()}-${sourceFileName}`;
   }
 
+  // Wrapper for Microsoft Graph calls. It attaches auth, accepts relative Graph
+  // paths, and retries transient responses that are common during conversion.
   async function graphFetch(pathOrUrl, options = {}) {
-    // Centralize Microsoft Graph auth and transient retry behavior. Conversion
-    // runs sequentially, but Graph can still throttle or temporarily fail.
     const token = await window.PortalCleanerOneDriveAuth.getAccessToken({ interactive: true });
     const url = pathOrUrl.startsWith("https://") ? pathOrUrl : `${GRAPH_ROOT}${pathOrUrl}`;
     const headers = new Headers(options.headers ?? {});
@@ -89,9 +87,9 @@
     throw new Error("Microsoft Graph request could not complete.");
   }
 
+  // Extracts useful Graph error text where available so the UI can show
+  // actionable consent, quota, upload, or conversion failures.
   async function parseGraphError(response, fallback) {
-    // Graph usually returns useful JSON errors. Preserve those messages so the
-    // UI can show actionable consent/quota/conversion failures.
     try {
       const payload = await response.json();
       return payload?.error?.message || payload?.error_description || fallback;
@@ -100,9 +98,9 @@
     }
   }
 
+  // Downloads the original slide deck from WBLE in the page context so Moodle's
+  // active cookies/session can be reused by the converter.
   async function fetchWbleResource(resource) {
-    // Keep WBLE downloads in the page context with the active Moodle cookies,
-    // matching the existing ZIP builder behavior.
     const response = await fetch(resource.href, {
       credentials: "include",
       redirect: "follow"
@@ -115,9 +113,9 @@
     return new Uint8Array(await response.arrayBuffer());
   }
 
+  // Uploads small decks directly to the user's OneDrive app folder. Microsoft
+  // Graph limits this endpoint, so larger decks use upload sessions instead.
   async function simpleUpload(graphFileName, bytes) {
-    // Microsoft Graph simple upload is limited to small files. Larger lecture
-    // decks must use an upload session below.
     const endpoint = `/me/drive/special/approot:/${encodeURIComponent(graphFileName)}:/content`;
     const response = await graphFetch(endpoint, {
       method: "PUT",
@@ -134,9 +132,9 @@
     return response.json();
   }
 
+  // Starts a chunked upload session for large or image-heavy lecture decks.
+  // The session URL is then used directly by uploadWithSession.
   async function createUploadSession(graphFileName) {
-    // Upload sessions let OneDrive accept large PPT/PPTX files in chunks and
-    // are the safer path for image-heavy lecture decks.
     const endpoint = `/me/drive/special/approot:/${encodeURIComponent(graphFileName)}:/createUploadSession`;
     const response = await graphFetch(endpoint, {
       method: "POST",
@@ -157,6 +155,8 @@
     return response.json();
   }
 
+  // Uploads large decks in chunks and returns the final OneDrive DriveItem.
+  // Graph only returns that item after the last chunk is accepted.
   async function uploadWithSession(graphFileName, bytes) {
     const session = await createUploadSession(graphFileName);
     let uploadedItem = null;
@@ -193,8 +193,8 @@
     return uploadedItem;
   }
 
+  // Routes each deck to the fastest reliable upload path based on size.
   function uploadToOneDrive(graphFileName, bytes) {
-    // Route by size so small slides stay fast while large decks remain reliable.
     if (bytes.length <= SIMPLE_UPLOAD_LIMIT_BYTES) {
       return simpleUpload(graphFileName, bytes);
     }
@@ -202,9 +202,9 @@
     return uploadWithSession(graphFileName, bytes);
   }
 
+  // Asks Microsoft Graph to render the uploaded PowerPoint as a PDF. This keeps
+  // conversion fidelity close to what students would get from Microsoft apps.
   async function exportDriveItemToPdf(itemId) {
-    // This is the high-fidelity step: Microsoft renders the PowerPoint file
-    // from OneDrive and returns the PDF bytes.
     const response = await graphFetch(`/me/drive/items/${encodeURIComponent(itemId)}/content?format=pdf`, {
       method: "GET"
     });
@@ -216,9 +216,9 @@
     return response.blob();
   }
 
+  // Removes the temporary OneDrive file. Cleanup is best-effort but important
+  // for privacy; 404 is fine because the item is already gone.
   async function deleteDriveItem(itemId) {
-    // Cleanup is best-effort but important for privacy. A 404 still counts as
-    // clean because the temporary item is already gone.
     const response = await graphFetch(`/me/drive/items/${encodeURIComponent(itemId)}`, {
       method: "DELETE"
     });
@@ -228,9 +228,9 @@
     }
   }
 
+  // Legacy standalone PDF download path. The combined ZIP flow bypasses this
+  // by requesting archive-mode conversion with download:false.
   function triggerPdfDownload(blob, fileName) {
-    // Use a local object URL so the generated PDF behaves like a normal browser
-    // download and never needs to pass through an external backend.
     const downloadLink = document.createElement("a");
     const objectUrl = URL.createObjectURL(blob);
 
@@ -246,18 +246,22 @@
     }, 1000);
   }
 
+  // Central source of truth for which WBLE resources are safe to send through
+  // the PowerPoint-to-PDF converter.
   function isConvertible(resource) {
-    // Keep v1 deliberately narrow. Other Office formats can be added after the
-    // PowerPoint path proves stable for engineering lecture slides.
     return ["PPT", "PPTX"].includes(String(resource?.format ?? "").toUpperCase());
   }
 
-  async function convertResource(resource, index, callbacks) {
+  // Converts a single deck through WBLE -> OneDrive -> Graph PDF export. The
+  // legacy standalone flow downloads each PDF; archive mode returns PDF bytes.
+  async function convertResource(resource, index, callbacks, options = {}) {
+    const shouldDownload = options.download !== false;
     const sourceFileName = sanitizeFileName(resource.title, resource.format, index);
     const pdfFileName = createPdfFileName(sourceFileName);
     const graphFileName = createGraphPathFileName(sourceFileName);
     let itemId = null;
     let cleanupWarning = null;
+    let pdfBytes = null;
 
     callbacks?.onFileStatus?.(index, "downloading", `Downloading ${sourceFileName} from WBLE...`);
     const bytes = await fetchWbleResource(resource);
@@ -272,8 +276,15 @@
       callbacks?.onFileStatus?.(index, "converting", `Converting ${sourceFileName} with Microsoft...`);
       const pdfBlob = await exportDriveItemToPdf(itemId);
 
-      callbacks?.onFileStatus?.(index, "saving", `Saving ${pdfFileName}...`);
-      triggerPdfDownload(pdfBlob, pdfFileName);
+      if (shouldDownload) {
+        callbacks?.onFileStatus?.(index, "saving", `Saving ${pdfFileName}...`);
+        triggerPdfDownload(pdfBlob, pdfFileName);
+      } else {
+        // Keep the generated PDF in memory only long enough for ZIP packaging.
+        // This avoids one browser save prompt per converted slide deck.
+        callbacks?.onFileStatus?.(index, "packing", `Preparing ${pdfFileName} for ZIP...`);
+        pdfBytes = new Uint8Array(await pdfBlob.arrayBuffer());
+      }
     } finally {
       if (itemId) {
         try {
@@ -291,8 +302,8 @@
       index,
       cleanupWarning ? "cleanup-warning" : "done",
       cleanupWarning
-        ? `${pdfFileName} downloaded, but a temporary OneDrive file may remain.`
-        : `${pdfFileName} downloaded.`
+        ? `${pdfFileName} ${shouldDownload ? "downloaded" : "converted"}, but a temporary OneDrive file may remain.`
+        : `${pdfFileName} ${shouldDownload ? "downloaded" : "converted"}.`
     );
 
     return {
@@ -300,13 +311,15 @@
       title: resource.title,
       sourceFileName,
       pdfFileName,
+      bytes: pdfBytes,
       cleanupWarning
     };
   }
 
-  async function convertResources(resources, callbacks = {}) {
-    // Sequential conversion keeps progress readable and reduces the chance of
-    // OneDrive quota spikes or Graph throttling during a bulk lecture download.
+  // Converts every eligible deck and returns ordered per-file results. This is
+  // intentionally sequential to avoid OneDrive quota spikes, Graph throttling,
+  // and high memory use from holding multiple PPT/PDF byte arrays at once.
+  async function convertResources(resources, callbacks = {}, options = {}) {
     const convertible = resources.filter(isConvertible);
     const results = [];
 
@@ -325,7 +338,7 @@
       const resource = convertible[index];
 
       try {
-        const result = await convertResource(resource, index, callbacks);
+        const result = await convertResource(resource, index, callbacks, options);
         results.push(result);
       } catch (error) {
         const message = error instanceof Error ? error.message : "Conversion failed.";
@@ -350,8 +363,15 @@
     };
   }
 
+  // Archive entrypoint used by "Download all files" when the user opts into PDF
+  // conversion. It shares the converter path but suppresses individual saves.
+  function convertResourcesForArchive(resources, callbacks = {}) {
+    return convertResources(resources, callbacks, { download: false });
+  }
+
   window.PortalCleanerOneDriveConverter = {
     convertResources,
+    convertResourcesForArchive,
     isConvertible
   };
 })();

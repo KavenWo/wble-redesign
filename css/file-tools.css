@@ -1,0 +1,368 @@
+/* ==========================================================================
+   File Tools Module
+   ==========================================================================
+   Styles the compact "Files" pill and the modal that lists downloadable
+   course files, ZIP actions, and OneDrive slide conversion progress.
+   ========================================================================== */
+
+html.portal-cleaner-active .portal-cleaner-file-tools {
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 0 0.85rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-file-tool-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.42rem !important;
+  min-height: 2.1rem !important;
+  max-width: 100% !important;
+  padding: 0.38rem 0.64rem !important;
+  border: 1px solid rgba(37, 99, 235, 0.18) !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  color: var(--pc-primary-strong) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08) !important;
+  cursor: pointer !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-file-tool-icon {
+  flex: 0 0 auto !important;
+  width: 0.94rem !important;
+  height: 0.94rem !important;
+  background: currentColor !important;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M16 13H8'/%3E%3Cpath d='M16 17H8'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-file-tool-count {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 1.25rem !important;
+  height: 1.25rem !important;
+  padding: 0 0.3rem !important;
+  border-radius: 999px !important;
+  background: var(--pc-primary-soft) !important;
+  color: var(--pc-primary-strong) !important;
+  font-size: 0.58rem !important;
+  font-weight: 900 !important;
+}
+
+html.portal-cleaner-files-modal-open {
+  overflow: hidden !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-modal[hidden] {
+  display: none !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 1.25rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-backdrop {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.42) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-dialog {
+  position: relative !important;
+  z-index: 1 !important;
+  display: grid !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) !important;
+  gap: 0.9rem !important;
+  width: min(56rem, calc(100vw - 2rem)) !important;
+  max-height: min(42rem, calc(100vh - 2rem)) !important;
+  overflow: hidden !important;
+  padding: 1rem !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 28px 72px rgba(15, 23, 42, 0.28) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-title {
+  margin: 0 0 0.18rem !important;
+  color: var(--pc-text) !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-summary,
+html.portal-cleaner-active .portal-cleaner-files-zip-status,
+html.portal-cleaner-active .portal-cleaner-files-conversion-status {
+  margin: 0 !important;
+  color: #475569 !important;
+  font-size: 0.74rem !important;
+  line-height: 1.45 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-close {
+  flex: 0 0 auto !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 999px !important;
+  background: #f8fafc !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  font-size: 0.85rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0.75rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-action {
+  display: grid !important;
+  align-content: start !important;
+  gap: 0.35rem !important;
+  min-width: 0 !important;
+  padding: 0.72rem !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 10px !important;
+  background: #f8fbff !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-action-button {
+  justify-self: start !important;
+  min-height: 2.2rem !important;
+  padding: 0.5rem 0.82rem !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  font-size: 0.72rem !important;
+  font-weight: 850 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-option {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: 0.52rem !important;
+  align-items: center !important;
+  color: var(--pc-text) !important;
+  cursor: pointer !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-option input {
+  width: 1rem !important;
+  height: 1rem !important;
+  margin: 0 !important;
+  accent-color: #0f766e !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-option:has(input:disabled) {
+  cursor: not-allowed !important;
+  opacity: 0.58 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-action-button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.52 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-list {
+  display: grid !important;
+  gap: 0.8rem !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  padding-right: 0.25rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-group {
+  display: grid !important;
+  gap: 0.42rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-group-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.7rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-group-title {
+  justify-self: start !important;
+  margin: 0 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-group-list,
+html.portal-cleaner-active .portal-cleaner-files-conversion-list {
+  display: grid !important;
+  gap: 0.35rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-conversion-list:empty {
+  display: none !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item,
+html.portal-cleaner-active .portal-cleaner-files-conversion-item {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+  gap: 0.6rem !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  padding: 0.48rem 0.6rem !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item[data-portal-cleaner-selected="false"] {
+  border-color: rgba(203, 213, 225, 0.72) !important;
+  background: #f8fafc !important;
+  opacity: 0.68 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-conversion-item {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select-label {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 1.55rem !important;
+  height: 1.55rem !important;
+  cursor: pointer !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+  margin: 0 !important;
+  accent-color: #2563eb !important;
+  cursor: pointer !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-category-select {
+  accent-color: #0f766e !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item-icon {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 1.45rem !important;
+  height: 1.45rem !important;
+  border-radius: 7px !important;
+  background: #edf4ff !important;
+  color: var(--pc-primary-strong) !important;
+  font-size: 0.48rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item-icon img {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+  object-fit: contain !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item-title,
+html.portal-cleaner-active .portal-cleaner-files-conversion-item-title {
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+  color: var(--pc-text) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item-meta,
+html.portal-cleaner-active .portal-cleaner-files-conversion-item-state {
+  min-width: 0 !important;
+  color: #64748b !important;
+  font-size: 0.62rem !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+  text-align: right !important;
+  text-transform: uppercase !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-zip-status[data-portal-cleaner-tone="success"],
+html.portal-cleaner-active .portal-cleaner-files-conversion-status[data-portal-cleaner-tone="success"],
+html.portal-cleaner-active .portal-cleaner-files-conversion-item[data-portal-cleaner-tone="success"] .portal-cleaner-files-conversion-item-state {
+  color: #15803d !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-zip-status[data-portal-cleaner-tone="warning"],
+html.portal-cleaner-active .portal-cleaner-files-conversion-status[data-portal-cleaner-tone="warning"],
+html.portal-cleaner-active .portal-cleaner-files-conversion-item[data-portal-cleaner-tone="warning"] .portal-cleaner-files-conversion-item-state {
+  color: #b45309 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-zip-status[data-portal-cleaner-tone="error"],
+html.portal-cleaner-active .portal-cleaner-files-conversion-status[data-portal-cleaner-tone="error"],
+html.portal-cleaner-active .portal-cleaner-files-conversion-item[data-portal-cleaner-tone="error"] .portal-cleaner-files-conversion-item-state {
+  color: #b91c1c !important;
+}
+
+@media (max-width: 720px) {
+  html.portal-cleaner-active .portal-cleaner-files-modal {
+    padding: 0.7rem !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-dialog {
+    width: calc(100vw - 1rem) !important;
+    max-height: calc(100vh - 1rem) !important;
+    padding: 0.82rem !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-conversion-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-item {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-item-meta {
+    grid-column: 2 !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-item-select-label {
+    grid-column: 3 !important;
+    grid-row: 1 / span 2 !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-item-meta,
+  html.portal-cleaner-active .portal-cleaner-files-conversion-item-state {
+    text-align: left !important;
+  }
+}
