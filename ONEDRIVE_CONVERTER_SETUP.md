@@ -23,10 +23,10 @@ The converter is extension-only. It uses the student's Microsoft account, upload
 After creating the app registration, copy the local config template:
 
 ```bash
-cp js/local-config.example.js js/local-config.js
+cp local-config.example.js local-config.js
 ```
 
-Then set your Application/Client ID from Microsoft Entra in `js/local-config.js`:
+Then set your Application/Client ID from Microsoft Entra in `local-config.js`:
 
 ```js
 globalThis.PortalCleanerLocalConfig = {
@@ -34,7 +34,7 @@ globalThis.PortalCleanerLocalConfig = {
 };
 ```
 
-`js/local-config.js` is ignored by Git so each developer can keep their own Microsoft app registration locally without editing tracked source files.
+`local-config.js` is ignored by Git so each developer can keep their own Microsoft app registration locally without editing tracked source files.
 
 ## Known Limits
 

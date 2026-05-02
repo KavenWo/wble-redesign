@@ -8,12 +8,12 @@
 
 try {
   // Local config keeps developer-specific Microsoft app registrations out of
-  // Git. Copy js/local-config.example.js to js/local-config.js when testing
+  // Git. Copy local-config.example.js to local-config.js when testing
   // OneDrive conversion locally.
-  importScripts("local-config.js");
+  importScripts("../local-config.js");
 } catch {
   // Missing local config is expected for fresh clones. The converter will stay
-  // disabled until the developer creates js/local-config.js.
+  // disabled until the developer creates local-config.js.
 }
 
 const MICROSOFT_CLIENT_ID = globalThis.PortalCleanerLocalConfig?.microsoftClientId ?? "YOUR_MICROSOFT_ENTRA_CLIENT_ID";
@@ -203,7 +203,7 @@ async function getAccessToken(interactive) {
   // The rest of the extension asks for tokens through this one function so we
   // can prefer cached tokens, then refresh tokens, then interactive login.
   if (!isMicrosoftConfigured()) {
-    throw new Error("Microsoft app registration is not configured yet. Copy js/local-config.example.js to js/local-config.js and set microsoftClientId.");
+    throw new Error("Microsoft app registration is not configured yet. Copy local-config.example.js to local-config.js and set microsoftClientId.");
   }
 
   const storedAuth = await getStoredAuth();

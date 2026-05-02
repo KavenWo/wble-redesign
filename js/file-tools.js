@@ -234,7 +234,7 @@
     const reason = error?.reason ?? error?.details?.reason;
 
     return reason === "microsoft-not-configured"
-      ? "Microsoft app registration is not configured yet. Copy js/local-config.example.js to js/local-config.js and set microsoftClientId."
+      ? "Microsoft app registration is not configured yet. Copy local-config.example.js to local-config.js and set microsoftClientId."
       : reason === "microsoft-consent-blocked"
         ? "Microsoft sign-in was blocked by this account or organization. UTAR/work accounts may need admin approval; try a personal Microsoft account."
         : reason === "sign-in-cancelled"

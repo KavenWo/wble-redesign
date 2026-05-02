@@ -75,6 +75,6 @@ The extension can convert WBLE `PPT`/`PPTX` downloads into PDFs using the studen
 
 UTAR/work/school Microsoft accounts may require administrator approval for third-party app consent. If sign-in is blocked, use a personal Microsoft account for the converter.
 
-Before testing conversion, create a Microsoft app registration and copy `js/local-config.example.js` to the ignored `js/local-config.js` file with your own client ID. See [ONEDRIVE_CONVERTER_SETUP.md](ONEDRIVE_CONVERTER_SETUP.md) for the setup steps and known limits.
+Before testing conversion, create a Microsoft app registration and copy `local-config.example.js` to the ignored `local-config.js` file with your own client ID. See [ONEDRIVE_CONVERTER_SETUP.md](ONEDRIVE_CONVERTER_SETUP.md) for the setup steps and known limits.
 
 This architecture is meant to give contributors more freedom to improve UI and UX without carrying a large amount of toggle-off cleanup logic in every feature.
