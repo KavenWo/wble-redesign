@@ -208,6 +208,11 @@ function getFileFormat(item, linkText) {
   const hiddenText = item.querySelector(".accesshide")?.textContent ?? "";
   const iconSource = item.querySelector(".activityicon")?.getAttribute("src") ?? "";
   const sourceText = `${hiddenText} ${iconSource} ${linkText}`.toLowerCase();
+
+  if (sourceText.includes("powerpoint")) {
+    return "PPT";
+  }
+
   const formats = ["pdf", "docx", "pptx", "ppt", "xlsx", "xls", "zip", "web"];
 
   for (const format of formats) {
@@ -225,6 +230,11 @@ function getFileFormat(item, linkText) {
 
 function getFormatFromSourceText(sourceText) {
   const normalizedSource = sourceText.toLowerCase();
+
+  if (normalizedSource.includes("powerpoint")) {
+    return "PPT";
+  }
+
   const formats = ["pdf", "docx", "pptx", "ppt", "xlsx", "xls", "zip", "mp4", "mp3", "web"];
 
   for (const format of formats) {
@@ -286,6 +296,8 @@ function getCategoryPresentation(type) {
 }
 
 function buildFileCardContent(options) {
+  // Shared by real activity rows and summary-link pseudo activities so both
+  // surfaces expose the same format/category labels to students and discovery.
   const content = document.createElement("span");
   content.className = "portal-cleaner-file-card-content";
 
@@ -457,6 +469,9 @@ function enhanceWeeklyActivities() {
       const cleanedName = cleanFileName(originalName) || originalName;
       const fileFormat = getFileFormat(item, originalName);
 
+      // Store normalized metadata on the original Moodle activity item. The
+      // download/conversion panel performs separate discovery, but these
+      // attributes keep the visible weekly cards aligned with that same model.
       item.dataset.portalCleanerFileType = category.type;
       item.dataset.portalCleanerCardEnhanced = "true";
       item.dataset.portalCleanerWeek = weekNumber ? String(weekNumber) : "0";
@@ -592,6 +607,9 @@ function extractSummaryAnnouncementText(summary) {
 }
 
 function enhanceWeeklySummaries() {
+  // Summary links can contain downloadable files that are not normal Moodle
+  // activity rows. Promote them into the same card grid so the course page and
+  // bulk tools do not visually disagree.
   const rows = getWeeklyOutlineRows();
 
   rows.forEach((row) => {

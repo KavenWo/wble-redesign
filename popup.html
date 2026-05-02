@@ -12,7 +12,7 @@
 
       body {
         margin: 0;
-        min-width: 260px;
+        min-width: 300px;
         background: #f4f7fb;
         color: #1f2937;
       }
@@ -33,7 +33,8 @@
         line-height: 1.4;
       }
 
-      label {
+      label,
+      .account-card {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -41,6 +42,65 @@
         border: 1px solid #d8e1ec;
         border-radius: 12px;
         padding: 12px;
+      }
+
+      .account-card {
+        align-items: stretch;
+        flex-direction: column;
+        margin-top: 10px;
+      }
+
+      .account-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .account-title {
+        margin: 0;
+        color: #1f2937;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .account-status {
+        margin: 0;
+        font-size: 12px;
+      }
+
+      .account-status[data-tone="success"] {
+        color: #15803d;
+      }
+
+      .account-status[data-tone="warning"] {
+        color: #b45309;
+      }
+
+      .account-status[data-tone="error"] {
+        color: #b91c1c;
+      }
+
+      button {
+        min-height: 32px;
+        border: 0;
+        border-radius: 999px;
+        background: #2563eb;
+        color: #fff;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 7px 12px;
+      }
+
+      button.secondary {
+        background: #e2e8f0;
+        color: #1f2937;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
       }
     </style>
   </head>
@@ -52,6 +112,16 @@
         <input type="checkbox" id="toggleCleaner" />
         Enable cleaner mode
       </label>
+      <section class="account-card" aria-label="Microsoft account">
+        <div class="account-row">
+          <div>
+            <p class="account-title">Microsoft conversion</p>
+            <p class="account-status" id="oneDriveStatus" data-tone="warning">Checking setup...</p>
+          </div>
+          <button type="button" id="oneDriveAction">Sign in</button>
+        </div>
+        <button type="button" class="secondary" id="oneDriveSignOut">Sign out</button>
+      </section>
     </main>
     <script src="js/popup.js"></script>
   </body>

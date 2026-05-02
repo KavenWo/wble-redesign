@@ -660,6 +660,81 @@ function updateBulkDownloadStatus(panel, message, tone) {
   status.dataset.portalCleanerTone = tone ?? "neutral";
 }
 
+function updateConversionStatus(panel, message, tone) {
+  // Conversion has a separate status line from ZIP packaging so both tools can
+  // coexist without overwriting each other's feedback.
+  const status = panel?.querySelector(".portal-cleaner-conversion-status");
+
+  if (!status) {
+    return;
+  }
+
+  status.textContent = message;
+  status.dataset.portalCleanerTone = tone ?? "neutral";
+}
+
+function getConvertibleResources(resources) {
+  // Keep content.js decoupled from the exact conversion rules. The converter
+  // owns the source of truth, with a tiny fallback in case script load order is
+  // interrupted.
+  return resources.filter((resource) => {
+    if (window.PortalCleanerOneDriveConverter?.isConvertible) {
+      return window.PortalCleanerOneDriveConverter.isConvertible(resource);
+    }
+
+    return ["PPT", "PPTX"].includes(String(resource?.format ?? "").toUpperCase());
+  });
+}
+
+function renderConversionProgressList(panel, resources) {
+  // Build a stable per-file list before conversion starts so sequential status
+  // updates do not shift the panel layout.
+  const list = panel?.querySelector(".portal-cleaner-conversion-list");
+
+  if (!list) {
+    return;
+  }
+
+  list.textContent = "";
+
+  resources.forEach((resource, index) => {
+    const item = document.createElement("li");
+    item.className = "portal-cleaner-conversion-item";
+    item.dataset.portalCleanerConversionIndex = String(index);
+    item.dataset.portalCleanerTone = "neutral";
+
+    const title = document.createElement("span");
+    title.className = "portal-cleaner-conversion-item-title";
+    title.textContent = resource.title;
+    item.appendChild(title);
+
+    const state = document.createElement("span");
+    state.className = "portal-cleaner-conversion-item-state";
+    state.textContent = "Queued";
+    item.appendChild(state);
+
+    list.appendChild(item);
+  });
+}
+
+function updateConversionProgressItem(panel, index, state, message) {
+  // The converter reports machine-friendly states; this maps them to visual
+  // tones while preserving detailed text from Graph/WBLE failures.
+  const item = panel?.querySelector(`.portal-cleaner-conversion-item[data-portal-cleaner-conversion-index="${index}"]`);
+  const stateNode = item?.querySelector(".portal-cleaner-conversion-item-state");
+
+  if (!item || !stateNode) {
+    return;
+  }
+
+  item.dataset.portalCleanerTone =
+    state === "failed" ? "error" :
+      state === "cleanup-warning" ? "warning" :
+        state === "done" ? "success" :
+          "neutral";
+  stateNode.textContent = message;
+}
+
 function triggerZipDownload(blob, courseFolderName) {
   const archiveBaseName =
     window.PortalCleanerResourceDiscovery?.slugifyPathSegment(courseFolderName, "Course Files") ??
@@ -716,30 +791,54 @@ function renderBulkDownloadPanel(discovery) {
     button.textContent = "Download all files";
     actions.appendChild(button);
 
+    const convertButton = document.createElement("button");
+    // Keep conversion as an additive action beside ZIP download. ZIP remains the
+    // fallback for students without Microsoft consent or OneDrive access.
+    convertButton.type = "button";
+    convertButton.className = "portal-cleaner-download-button portal-cleaner-conversion-button";
+    convertButton.textContent = "Convert slides to PDF";
+    actions.appendChild(convertButton);
+
     const status = document.createElement("p");
     status.className = "portal-cleaner-download-status";
     status.setAttribute("aria-live", "polite");
     actions.appendChild(status);
 
+    const conversionStatus = document.createElement("p");
+    conversionStatus.className = "portal-cleaner-conversion-status";
+    conversionStatus.setAttribute("aria-live", "polite");
+    actions.appendChild(conversionStatus);
+
+    const conversionList = document.createElement("ul");
+    conversionList.className = "portal-cleaner-conversion-list";
+
     panel.appendChild(textWrap);
     panel.appendChild(actions);
+    panel.appendChild(conversionList);
     firstWeekContent.prepend(panel);
   }
 
   const description = panel.querySelector(".portal-cleaner-download-description");
   const button = panel.querySelector(".portal-cleaner-download-button");
+  const convertButton = panel.querySelector(".portal-cleaner-conversion-button");
 
-  if (!description || !(button instanceof HTMLButtonElement)) {
+  if (!description || !(button instanceof HTMLButtonElement) || !(convertButton instanceof HTMLButtonElement)) {
     return;
   }
 
   const downloadableCount = discovery.downloadable.length;
+  const convertibleResources = getConvertibleResources(discovery.downloadable);
+  const convertibleCount = convertibleResources.length;
   const skippedCount = discovery.skipped.length;
   description.textContent = downloadableCount > 0
-    ? `Package ${downloadableCount} course file${downloadableCount === 1 ? "" : "s"} into one ZIP download. ${skippedCount > 0 ? `${skippedCount} non-file link${skippedCount === 1 ? " was" : "s were"} skipped.` : ""}`
+    ? `Package ${downloadableCount} course file${downloadableCount === 1 ? "" : "s"} into one ZIP download. ${convertibleCount > 0 ? `${convertibleCount} slide deck${convertibleCount === 1 ? "" : "s"} can be converted to PDF. ` : ""}${skippedCount > 0 ? `${skippedCount} non-file link${skippedCount === 1 ? " was" : "s were"} skipped.` : ""}`
     : `No downloadable course files were found on this page. ${skippedCount > 0 ? `${skippedCount} non-file link${skippedCount === 1 ? " was" : "s were"} skipped.` : ""}`;
 
   button.disabled = downloadableCount === 0;
+  // Hide the Microsoft path entirely on pages without slide decks so the bulk
+  // panel stays focused on the available action.
+  convertButton.disabled = convertibleCount === 0;
+  convertButton.hidden = convertibleCount === 0;
 
   if (panel.dataset.portalCleanerDownloadBound === "true") {
     return;
@@ -780,6 +879,69 @@ function renderBulkDownloadPanel(discovery) {
       updateBulkDownloadStatus(panel, `ZIP download failed: ${error instanceof Error ? error.message : "unknown error"}.`, "error");
     } finally {
       button.disabled = false;
+    }
+  });
+
+  convertButton.addEventListener("click", async () => {
+    if (convertButton.disabled) {
+      return;
+    }
+
+    if (!window.PortalCleanerOneDriveConverter) {
+      updateConversionStatus(panel, "OneDrive converter is not available on this page.", "error");
+      return;
+    }
+
+    button.disabled = true;
+    convertButton.disabled = true;
+    // Freeze the current convertible list for this run. Moodle pages can be
+    // enhanced repeatedly, but a conversion job should not change mid-flight.
+    renderConversionProgressList(panel, convertibleResources);
+    updateConversionStatus(panel, "Waiting for Microsoft sign-in...", "neutral");
+
+    try {
+      const response = await window.PortalCleanerOneDriveConverter.convertResources(convertibleResources, {
+        onOverallStatus(state, message) {
+          updateConversionStatus(panel, message, "neutral");
+        },
+        onFileStatus(index, state, message) {
+          updateConversionProgressItem(panel, index, state, message);
+          updateConversionStatus(panel, message, state === "failed" ? "error" : state === "cleanup-warning" ? "warning" : "neutral");
+        }
+      });
+
+      const successCount = response.successCount ?? response.results?.filter((result) => result.ok).length ?? 0;
+      const failureCount = response.failureCount ?? response.results?.filter((result) => !result.ok).length ?? 0;
+      const cleanupWarningCount = response.cleanupWarningCount ?? 0;
+
+      if (successCount === 0) {
+        updateConversionStatus(panel, "No slide decks could be converted. ZIP download is still available.", "error");
+        return;
+      }
+
+      const failureSuffix = failureCount > 0 ? ` ${failureCount} deck${failureCount === 1 ? "" : "s"} failed.` : "";
+      const cleanupSuffix = cleanupWarningCount > 0 ? ` ${cleanupWarningCount} temporary OneDrive file${cleanupWarningCount === 1 ? "" : "s"} may remain.` : "";
+      updateConversionStatus(
+        panel,
+        `${successCount} PDF${successCount === 1 ? "" : "s"} downloaded.${failureSuffix}${cleanupSuffix}`,
+        failureCount > 0 || cleanupWarningCount > 0 ? "warning" : "success"
+      );
+    } catch (error) {
+      const reason = error?.reason ?? error?.details?.reason;
+      // These messages intentionally point back to ZIP fallback because blocked
+      // Microsoft consent is common on school-managed accounts.
+      const message =
+        reason === "microsoft-not-configured"
+          ? "Microsoft app registration is not configured yet. Add your Entra client ID in js/background.js."
+          : reason === "microsoft-consent-blocked"
+            ? "Microsoft sign-in was blocked by this account or organization. ZIP download is still available."
+            : reason === "sign-in-cancelled"
+              ? "Microsoft sign-in was cancelled. ZIP download is still available."
+              : `Slide conversion failed: ${error instanceof Error ? error.message : "unknown error"}.`;
+      updateConversionStatus(panel, message, reason === "sign-in-cancelled" ? "warning" : "error");
+    } finally {
+      button.disabled = downloadableCount === 0;
+      convertButton.disabled = convertibleCount === 0;
     }
   });
 }

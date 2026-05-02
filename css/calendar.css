@@ -53,7 +53,6 @@ html.portal-cleaner-active .block_calendar_month .calendar-controls .previous:ho
 html.portal-cleaner-active .block_calendar_month .calendar-controls .next:hover {
   background: var(--pc-primary-soft) !important;
   color: var(--pc-primary) !important;
-  transform: translateY(-1px) !important;
 }
 
 html.portal-cleaner-active .block_calendar_month .calendar-controls .arrow {
@@ -141,7 +140,7 @@ html.portal-cleaner-active .block_calendar_month .minicalendar th abbr {
    not cause layout shift inside the compact sidebar calendar. */
 html.portal-cleaner-active .block_calendar_month .minicalendar td {
   position: relative !important;
-  height: 1.75rem !important;
+  height: 1.5rem !important;
   border-radius: 8px !important;
   color: var(--pc-text) !important;
   font-size: 0.68rem !important;
@@ -180,20 +179,8 @@ html.portal-cleaner-active .block_calendar_month .minicalendar td a {
 html.portal-cleaner-active .block_calendar_month .minicalendar td[class*="event_"] {
   background: var(--pc-primary-soft) !important;
   color: var(--pc-primary-strong) !important;
-  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.16) !important;
 }
 
-html.portal-cleaner-active .block_calendar_month .minicalendar td[class*="event_"]::after {
-  content: "" !important;
-  position: absolute !important;
-  left: 50% !important;
-  bottom: 0.22rem !important;
-  width: 0.22rem !important;
-  height: 0.22rem !important;
-  border-radius: 999px !important;
-  background: var(--pc-primary) !important;
-  transform: translateX(-50%) !important;
-}
 
 html.portal-cleaner-active .block_calendar_month .minicalendar td[class*="event_"]:hover {
   background: #dbeafe !important;
@@ -205,7 +192,10 @@ html.portal-cleaner-active .block_calendar_month .minicalendar td[class*="event_
 html.portal-cleaner-active .block_calendar_month .minicalendar td.today {
   background: var(--pc-primary) !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22) !important;
+}
+
+html.portal-cleaner-active .block_calendar_month .minicalendar td.today:hover {
+  background: var(--pc-primary-strong) !important;
 }
 
 html.portal-cleaner-active .block_calendar_month .minicalendar td.today::after {

@@ -520,6 +520,11 @@ html.portal-cleaner-active .portal-cleaner-download-button {
   transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease !important;
 }
 
+html.portal-cleaner-active .portal-cleaner-conversion-button {
+  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%) !important;
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.2) !important;
+}
+
 html.portal-cleaner-active .portal-cleaner-download-button:hover:not(:disabled) {
   transform: translateY(-1px) !important;
   box-shadow: 0 18px 28px rgba(37, 99, 235, 0.24) !important;
@@ -543,6 +548,82 @@ html.portal-cleaner-active .portal-cleaner-download-status[data-portal-cleaner-t
   color: #b91c1c !important;
 }
 
+html.portal-cleaner-active .portal-cleaner-conversion-status {
+  margin: 0 !important;
+  color: #475569 !important;
+  font-size: 0.74rem !important;
+  line-height: 1.45 !important;
+  max-width: 18rem !important;
+  text-align: right !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-status[data-portal-cleaner-tone="success"] {
+  color: #15803d !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-status[data-portal-cleaner-tone="warning"] {
+  color: #b45309 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-status[data-portal-cleaner-tone="error"] {
+  color: #b91c1c !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-list {
+  grid-column: 1 / -1 !important;
+  display: grid !important;
+  gap: 0.35rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-list:empty {
+  display: none !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(8rem, auto) !important;
+  gap: 0.6rem !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  padding: 0.38rem 0.55rem !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-item-title,
+html.portal-cleaner-active .portal-cleaner-conversion-item-state {
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+  color: #475569 !important;
+  font-size: 0.68rem !important;
+  line-height: 1.35 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-item-title {
+  color: var(--pc-text) !important;
+  font-weight: 700 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-item-state {
+  text-align: right !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-item[data-portal-cleaner-tone="success"] .portal-cleaner-conversion-item-state {
+  color: #15803d !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-item[data-portal-cleaner-tone="warning"] .portal-cleaner-conversion-item-state {
+  color: #b45309 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-conversion-item[data-portal-cleaner-tone="error"] .portal-cleaner-conversion-item-state {
+  color: #b91c1c !important;
+}
+
 @media (max-width: 720px) {
   html.portal-cleaner-active .portal-cleaner-download-panel {
     grid-template-columns: 1fr !important;
@@ -550,5 +631,14 @@ html.portal-cleaner-active .portal-cleaner-download-status[data-portal-cleaner-t
 
   html.portal-cleaner-active .portal-cleaner-download-actions {
     justify-items: start !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-conversion-status,
+  html.portal-cleaner-active .portal-cleaner-conversion-item-state {
+    text-align: left !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-conversion-item {
+    grid-template-columns: 1fr !important;
   }
 }

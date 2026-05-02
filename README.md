@@ -68,4 +68,10 @@ To keep the redesign flexible while preserving confidence in the original Moodle
    - Prefer layout techniques such as Flexbox `order` before reaching for JavaScript DOM movement.
 8. **Minimize JavaScript bloat**: Use JavaScript only when CSS cannot achieve the needed UX. JavaScript should focus on focused enhancement work such as DOM injection, semantic upgrades, or interaction behavior that styling alone cannot provide.
 
+## OneDrive PPTX-to-PDF Converter
+
+The extension can convert WBLE `PPT`/`PPTX` downloads into PDFs using the student's own Microsoft OneDrive and Microsoft Graph. This is extension-only; it does not require a backend server.
+
+Before testing conversion, create the Microsoft app registration and replace the placeholder client ID in `js/background.js`. See [ONEDRIVE_CONVERTER_SETUP.md](ONEDRIVE_CONVERTER_SETUP.md) for the setup steps and known limits.
+
 This architecture is meant to give contributors more freedom to improve UI and UX without carrying a large amount of toggle-off cleanup logic in every feature.

@@ -3,8 +3,12 @@
   "name": "UTAR WBLE Cleaner",
   "version": "0.1.0",
   "description": "Light UI cleanup for the UTAR WBLE portal.",
-  "permissions": ["storage", "tabs", "downloads"],
-  "host_permissions": ["https://ewble-sl.utar.edu.my/*"],
+  "permissions": ["storage", "tabs", "downloads", "identity"],
+  "host_permissions": [
+    "https://ewble-sl.utar.edu.my/*",
+    "https://graph.microsoft.com/*",
+    "https://login.microsoftonline.com/*"
+  ],
   "content_scripts": [
     {
       "matches": ["https://ewble-sl.utar.edu.my/*"],
@@ -21,7 +25,15 @@
         "css/login.css",
         "css/weekly.css"
       ],
-      "js": ["js/resource-discovery.js", "js/zip-builder.js", "js/weekly.js", "js/content.js", "js/controller.js"],
+      "js": [
+        "js/resource-discovery.js",
+        "js/zip-builder.js",
+        "js/onedrive-auth.js",
+        "js/onedrive-converter.js",
+        "js/weekly.js",
+        "js/content.js",
+        "js/controller.js"
+      ],
       "run_at": "document_start"
     }
   ],

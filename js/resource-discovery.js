@@ -63,6 +63,10 @@ function getSourceText(item, linkText, href) {
 // We intentionally keep the first pass strict: only formats that behave like
 // real downloadable files should enter the ZIP flow.
 function detectFormat(sourceText) {
+  if (sourceText.includes("powerpoint")) {
+    return "PPT";
+  }
+
   const formats = ["pdf", "docx", "pptx", "ppt", "xlsx", "xls", "zip", "doc", "rar", "7z"];
 
   for (const format of formats) {
