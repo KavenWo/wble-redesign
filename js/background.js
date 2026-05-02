@@ -6,7 +6,17 @@
    OAuth flow needed for OneDrive-based PowerPoint conversion.
    ========================================================================== */
 
-const MICROSOFT_CLIENT_ID = "d0480012-0060-4089-a572-b3d8a1925bc3";
+try {
+  // Local config keeps developer-specific Microsoft app registrations out of
+  // Git. Copy js/local-config.example.js to js/local-config.js when testing
+  // OneDrive conversion locally.
+  importScripts("local-config.js");
+} catch {
+  // Missing local config is expected for fresh clones. The converter will stay
+  // disabled until the developer creates js/local-config.js.
+}
+
+const MICROSOFT_CLIENT_ID = globalThis.PortalCleanerLocalConfig?.microsoftClientId ?? "YOUR_MICROSOFT_ENTRA_CLIENT_ID";
 const MICROSOFT_AUTHORITY = "https://login.microsoftonline.com/common/oauth2/v2.0";
 const MICROSOFT_SCOPES = ["Files.ReadWrite.AppFolder", "offline_access"];
 const MICROSOFT_AUTH_STORAGE_KEY = "oneDriveAuth";
@@ -17,7 +27,7 @@ function isWbleTab(tab) {
 }
 
 function isMicrosoftConfigured() {
-  return MICROSOFT_CLIENT_ID !== "YOUR_MICROSOFT_ENTRA_CLIENT_ID";
+  return Boolean(MICROSOFT_CLIENT_ID) && MICROSOFT_CLIENT_ID !== "YOUR_MICROSOFT_ENTRA_CLIENT_ID";
 }
 
 function base64UrlEncode(bytes) {
@@ -193,7 +203,7 @@ async function getAccessToken(interactive) {
   // The rest of the extension asks for tokens through this one function so we
   // can prefer cached tokens, then refresh tokens, then interactive login.
   if (!isMicrosoftConfigured()) {
-    throw new Error("Microsoft app registration is not configured yet. Replace YOUR_MICROSOFT_ENTRA_CLIENT_ID in js/background.js.");
+    throw new Error("Microsoft app registration is not configured yet. Copy js/local-config.example.js to js/local-config.js and set microsoftClientId.");
   }
 
   const storedAuth = await getStoredAuth();

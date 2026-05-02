@@ -8,9 +8,10 @@ The converter is extension-only. It uses the student's Microsoft account, upload
 2. Create an app registration named `UTAR WBLE Cleaner`.
 3. Supported account types:
    - Use `Accounts in any organizational directory and personal Microsoft accounts` if you want both university and personal Microsoft accounts.
+   - UTAR or other university Microsoft accounts may show an admin approval/consent request. For smoother testing, sign in with a personal Microsoft account.
 4. Platform/redirect URI:
    - Add a browser/public-client redirect URI matching Chrome's extension redirect URL:
-     `https://blnniinhfaegbpcihamclnhaifahlflo.chromiumapp.org/`
+     `https://<your-extension-id>.chromiumapp.org/`
    - In development, keep the extension ID stable. If the ID changes, this redirect URI must be updated in Microsoft.
 5. API permissions:
    - Add Microsoft Graph delegated permission `Files.ReadWrite.AppFolder`.
@@ -19,17 +20,25 @@ The converter is extension-only. It uses the student's Microsoft account, upload
 
 ## Extension Configuration
 
-After creating the app registration, replace this placeholder in `js/background.js`:
+After creating the app registration, copy the local config template:
 
-```js
-const MICROSOFT_CLIENT_ID = "YOUR_MICROSOFT_ENTRA_CLIENT_ID";
+```bash
+cp js/local-config.example.js js/local-config.js
 ```
 
-Use the Application/Client ID from Microsoft Entra.
+Then set your Application/Client ID from Microsoft Entra in `js/local-config.js`:
+
+```js
+globalThis.PortalCleanerLocalConfig = {
+  microsoftClientId: "YOUR_MICROSOFT_ENTRA_CLIENT_ID"
+};
+```
+
+`js/local-config.js` is ignored by Git so each developer can keep their own Microsoft app registration locally without editing tracked source files.
 
 ## Known Limits
 
-- Some university Microsoft tenants block student consent for third-party apps. When this happens, the extension will keep the normal ZIP fallback available.
+- Some university Microsoft tenants, including UTAR-style work/school accounts, may block student consent for third-party apps or ask for administrator approval. When this happens, use a personal Microsoft account for conversion; the extension will keep the normal ZIP fallback available.
 - Microsoft Graph conversion is much more accurate than LibreOffice for PowerPoint files, but it can still fail for encrypted, corrupted, very large, or unusual decks.
 - Temporary files should be deleted after each conversion. If cleanup fails, the UI warns that a temporary file may remain in OneDrive.
 - The v1 converter only handles `PPT` and `PPTX`.

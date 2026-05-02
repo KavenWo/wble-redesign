@@ -104,7 +104,7 @@ oneDriveAction?.addEventListener("click", async () => {
   if (!response.ok) {
     const message =
       response.reason === "microsoft-consent-blocked"
-        ? "This Microsoft account or organization blocked consent."
+        ? "This Microsoft account or organization blocked consent. UTAR/work accounts may need admin approval; try a personal Microsoft account."
         : response.reason === "sign-in-cancelled"
           ? "Microsoft sign-in was cancelled."
           : response.error || "Microsoft sign-in failed.";

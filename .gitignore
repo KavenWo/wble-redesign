@@ -8,6 +8,7 @@ node_modules/
 # Secrets and environment variables
 .env
 *.pem
+js/local-config.js
 
 # Local IDE folders
 .vscode/
