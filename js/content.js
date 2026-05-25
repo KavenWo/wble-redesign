@@ -243,6 +243,47 @@ function setupCourseToggle() {
   list.dataset.portalCleanerToggleInitialized = "true";
 }
 
+// Shortens Moodle's mini-calendar month label from "April 2026" to "APR 2026"
+// so the compact sidebar header reads cleanly without needing wider controls.
+function enhanceCalendarMonthLabel() {
+  const monthLink = document.querySelector(".block_calendar_month .calendar-controls .current a");
+
+  if (!monthLink || monthLink.dataset.portalCleanerEnhanced === "true") {
+    return;
+  }
+
+  const originalLabel = (monthLink.textContent ?? "").replace(/\s+/g, " ").trim();
+  const match = originalLabel.match(/^([A-Za-z]+)\s+(\d{4})$/);
+
+  if (!match) {
+    return;
+  }
+
+  const monthNames = {
+    january: "JAN",
+    february: "FEB",
+    march: "MAR",
+    april: "APR",
+    may: "MAY",
+    june: "JUN",
+    july: "JUL",
+    august: "AUG",
+    september: "SEP",
+    october: "OCT",
+    november: "NOV",
+    december: "DEC"
+  };
+  const shortMonth = monthNames[match[1].toLowerCase()];
+
+  if (!shortMonth) {
+    return;
+  }
+
+  monthLink.dataset.portalCleanerEnhanced = "true";
+  monthLink.dataset.portalCleanerOriginalLabel = originalLabel;
+  monthLink.textContent = `${shortMonth} ${match[2]}`;
+}
+
 function getMenuIcon(label) {
   const normalized = label.toLowerCase();
   const icons = {
@@ -677,6 +718,7 @@ function enhancePage() {
   normalizeLoginChrome();
   simplifyLoginContent();
   enhanceCourseListBlock();
+  enhanceCalendarMonthLabel();
   enhanceMenuNavigation();
   enhanceNewsBlock();
   rebuildHeader();
