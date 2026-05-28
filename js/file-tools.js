@@ -108,10 +108,14 @@
     return resources.filter((resource) => selectedKeys.has(getResourceSelectionKey(resource)));
   }
 
+  function getSelectedCount(modal, resources) {
+    return getSelectedResources(modal, resources).length;
+  }
+
   function updateSelectionSummary(modal) {
     const discovery = modal.portalCleanerDiscovery;
     const resources = discovery?.downloadable ?? [];
-    const selectedCount = getSelectedResources(modal, resources).length;
+    const selectedCount = getSelectedCount(modal, resources);
     const totalCount = resources.length;
     const selectedConvertibleCount = getConvertibleResources(getSelectedResources(modal, resources)).length;
     const hasConvertibleResources = getConvertibleResources(resources).length > 0;
@@ -127,7 +131,7 @@
 
     if (zipButton) {
       zipButton.disabled = selectedCount === 0;
-      zipButton.textContent = selectedCount === totalCount ? "Download all files" : "Download selected files";
+      zipButton.textContent = selectedCount === totalCount ? "Download All Files" : "Download Selected Files";
     }
 
     if (convertOption) {
@@ -164,6 +168,52 @@
 
     updateAllCategorySelectionControls(modal);
     updateSelectionSummary(modal);
+  }
+
+  function setResourceGroupSelected(modal, resources, groupList, shouldSelect) {
+    // Group-level toggles write through each child checkbox so DOM state,
+    // modal state, and visible selected-card styling stay synchronized.
+    resources.forEach((resource) => {
+      const resourceKey = getResourceSelectionKey(resource);
+      const item = Array.from(groupList.querySelectorAll(".portal-cleaner-files-item"))
+        .find((candidate) => candidate.dataset.portalCleanerResourceKey === resourceKey);
+      const itemInput = item?.querySelector(".portal-cleaner-files-item-select");
+
+      if (shouldSelect) {
+        modal.portalCleanerSelectedResourceKeys.add(resourceKey);
+      } else {
+        modal.portalCleanerSelectedResourceKeys.delete(resourceKey);
+      }
+
+      if (item) {
+        item.dataset.portalCleanerSelected = shouldSelect ? "true" : "false";
+      }
+
+      if (itemInput) {
+        itemInput.checked = shouldSelect;
+      }
+    });
+  }
+
+  function rememberBulkToggleState(input) {
+    if (!input) {
+      return;
+    }
+
+    input.dataset.portalCleanerWasPartial = input.indeterminate ? "true" : "false";
+  }
+
+  function resolveBulkToggleSelection(input) {
+    const wasPartial = input?.dataset?.portalCleanerWasPartial === "true";
+
+    if (input?.dataset) {
+      delete input.dataset.portalCleanerWasPartial;
+    }
+
+    // Browsers clear the visual dash before "change" runs. Remembering that
+    // previous dash state lets bulk controls clear partial selections first
+    // while still allowing normal unchecked -> checked selection clicks.
+    return wasPartial ? false : Boolean(input?.checked);
   }
 
   function updateCategorySelectionControl(modal, groupType) {
@@ -508,31 +558,20 @@
         groupList.appendChild(item);
       });
 
+      categoryLabel.addEventListener("pointerdown", () => {
+        rememberBulkToggleState(categoryInput);
+      });
+
+      categoryInput.addEventListener("keydown", (event) => {
+        if (event.key === " " || event.key === "Enter") {
+          rememberBulkToggleState(categoryInput);
+        }
+      });
+
       categoryInput.addEventListener("change", () => {
-        const shouldSelect = categoryInput.checked;
+        const shouldSelect = resolveBulkToggleSelection(categoryInput);
 
-        // Category selection writes through each child checkbox so DOM state,
-        // modal state, and visible selected-card styling stay synchronized.
-        group.resources.forEach((resource) => {
-          const resourceKey = getResourceSelectionKey(resource);
-          const item = Array.from(groupList.querySelectorAll(".portal-cleaner-files-item"))
-            .find((candidate) => candidate.dataset.portalCleanerResourceKey === resourceKey);
-          const itemInput = item?.querySelector(".portal-cleaner-files-item-select");
-
-          if (shouldSelect) {
-            modal.portalCleanerSelectedResourceKeys.add(resourceKey);
-          } else {
-            modal.portalCleanerSelectedResourceKeys.delete(resourceKey);
-          }
-
-          if (item) {
-            item.dataset.portalCleanerSelected = shouldSelect ? "true" : "false";
-          }
-
-          if (itemInput) {
-            itemInput.checked = shouldSelect;
-          }
-        });
+        setResourceGroupSelected(modal, group.resources, groupList, shouldSelect);
 
         updateCategorySelectionControl(modal, group.presentation.type);
         updateSelectionSummary(modal);
@@ -559,11 +598,25 @@
     const zipButton = modal.querySelector(".portal-cleaner-files-download-button");
     const convertOption = modal.querySelector(".portal-cleaner-files-convert-option");
     const selectAllOption = modal.querySelector(".portal-cleaner-files-select-all-option");
+    const selectAllLabel = selectAllOption?.closest(".portal-cleaner-files-option");
     const getCurrentDiscovery = () => modal.portalCleanerDiscovery ?? discovery;
+
+    selectAllLabel?.addEventListener("pointerdown", () => {
+      rememberBulkToggleState(selectAllOption);
+    });
+
+    selectAllOption?.addEventListener("keydown", (event) => {
+      if (event.key === " " || event.key === "Enter") {
+        rememberBulkToggleState(selectAllOption);
+      }
+    });
 
     selectAllOption?.addEventListener("change", () => {
       const currentDiscovery = getCurrentDiscovery();
-      setAllResourcesSelected(modal, currentDiscovery.downloadable, selectAllOption.checked);
+      const resources = currentDiscovery.downloadable;
+      const shouldSelect = resolveBulkToggleSelection(selectAllOption);
+
+      setAllResourcesSelected(modal, resources, shouldSelect);
     });
 
     zipButton?.addEventListener("click", async () => {
@@ -667,35 +720,43 @@
       modal.id = MODAL_ID;
       modal.className = "portal-cleaner-files-modal";
       modal.hidden = true;
+      // The modal keeps file selection near the title, while conversion and
+      // ZIP download controls stay pinned in the bottom action bar.
       modal.innerHTML = `
         <div class="portal-cleaner-files-backdrop" data-portal-cleaner-files-close="true"></div>
         <section class="portal-cleaner-files-dialog" role="dialog" aria-modal="true" aria-labelledby="portal-cleaner-files-title">
           <header class="portal-cleaner-files-header">
-            <div>
+            <div class="portal-cleaner-files-heading">
               <h2 id="portal-cleaner-files-title" class="portal-cleaner-files-title">Files</h2>
               <p class="portal-cleaner-files-summary"></p>
             </div>
-            <button type="button" class="portal-cleaner-files-close" aria-label="Close files">x</button>
-          </header>
-          <div class="portal-cleaner-files-actions">
-            <div class="portal-cleaner-files-action">
-              <button type="button" class="portal-cleaner-files-action-button portal-cleaner-files-download-button">Download all files</button>
-              <p class="portal-cleaner-files-zip-status" aria-live="polite"></p>
-            </div>
-            <div class="portal-cleaner-files-action">
-              <label class="portal-cleaner-files-option">
-                <input type="checkbox" class="portal-cleaner-files-convert-option">
-                <span>Convert PPT/PPTX to PDF before zipping</span>
-              </label>
-              <label class="portal-cleaner-files-option">
-                <input type="checkbox" class="portal-cleaner-files-select-all-option">
+            <div class="portal-cleaner-files-header-controls">
+              <button type="button" class="portal-cleaner-files-close" aria-label="Close files">&times;</button>
+              <label class="portal-cleaner-files-option portal-cleaner-files-select-all-label">
                 <span>Select all files</span>
+                <span class="portal-cleaner-files-select-label portal-cleaner-files-select-all-control">
+                  <input type="checkbox" class="portal-cleaner-files-select portal-cleaner-files-select-all-option">
+                </span>
               </label>
-              <p class="portal-cleaner-files-conversion-status" aria-live="polite"></p>
             </div>
+          </header>
+          <div class="portal-cleaner-files-browser">
+            <div class="portal-cleaner-files-list"></div>
           </div>
           <ul class="portal-cleaner-files-conversion-list"></ul>
-          <div class="portal-cleaner-files-list"></div>
+          <footer class="portal-cleaner-files-actions">
+            <div class="portal-cleaner-files-action-status">
+              <label class="portal-cleaner-files-option">
+                <span class="portal-cleaner-files-select-label portal-cleaner-files-convert-control">
+                  <input type="checkbox" class="portal-cleaner-files-select portal-cleaner-files-convert-option">
+                </span>
+                <span>Convert PPT/PPTX to PDF</span>
+              </label>
+              <p class="portal-cleaner-files-conversion-status" aria-live="polite"></p>
+              <p class="portal-cleaner-files-zip-status" aria-live="polite"></p>
+            </div>
+            <button type="button" class="portal-cleaner-files-action-button portal-cleaner-files-download-button">Download files</button>
+          </footer>
         </section>
       `;
 
@@ -720,7 +781,7 @@
 
     const zipButton = modal.querySelector(".portal-cleaner-files-download-button");
     const convertOption = modal.querySelector(".portal-cleaner-files-convert-option");
-    const convertAction = convertOption?.closest(".portal-cleaner-files-action");
+    const convertAction = convertOption?.closest(".portal-cleaner-files-option");
 
     syncSelectionState(modal, discovery.downloadable);
     zipButton.disabled = getSelectedResources(modal, discovery.downloadable).length === 0;

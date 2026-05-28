@@ -245,6 +245,21 @@ html.portal-cleaner-active .sideblock .header {
   margin-bottom: 0 !important;
 }
 
+html.portal-cleaner-active #left-column .sideblock .header .title,
+html.portal-cleaner-active #right-column .sideblock .header .title,
+html.portal-cleaner-active .side-pre .sideblock .header .title,
+html.portal-cleaner-active .side-post .sideblock .header .title {
+  display: flex !important;
+  align-items: center !important;
+}
+
+html.portal-cleaner-active #left-column .sideblock .hide-show-image,
+html.portal-cleaner-active #right-column .sideblock .hide-show-image,
+html.portal-cleaner-active .side-pre .sideblock .hide-show-image,
+html.portal-cleaner-active .side-post .sideblock .hide-show-image {
+  display: none !important;
+}
+
 html.portal-cleaner-active .header h2,
 html.portal-cleaner-active .block .header h2,
 html.portal-cleaner-active .sideblock .header h2 {

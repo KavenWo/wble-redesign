@@ -107,7 +107,7 @@ html.portal-cleaner-active tr.section.main[id^="section-"] .summary {
   padding: 0.5rem 0.65rem !important;
   background: transparent !important;
   border: none !important;
-  color: #475569 !important;
+  color: var(--pc-text) !important;
   font-size: 0.76rem !important;
   line-height: 1.5 !important;
 }
@@ -187,7 +187,7 @@ html.portal-cleaner-active tr.section.main[id^="section-"] li.activity.label .la
   border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
-  color: #475569 !important;
+  color: var(--pc-text) !important;
   font-size: 0.76rem !important;
   line-height: 1.5 !important;
   overflow: hidden !important;
@@ -267,7 +267,11 @@ html.portal-cleaner-active .portal-cleaner-week-badge {
 html.portal-cleaner-active .portal-cleaner-week-label {
   flex: 1 1 auto !important;
   min-width: 0 !important;
+  font-family: var(--pc-font) !important;
+  font-stretch: normal !important;
   font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-week-current {

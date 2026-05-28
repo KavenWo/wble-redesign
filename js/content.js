@@ -431,7 +431,27 @@ function applyNewsBlockAccessibility() {
 // original anchor target in the DOM for a reversible enhancement.
 function enhanceNewsBlock() {
   const posts = document.querySelectorAll(".block_news_items.sideblock li.post");
+  const contents = document.querySelectorAll(".block_news_items.sideblock .content");
   const footers = document.querySelectorAll(".block_news_items.sideblock .footer");
+
+  contents.forEach((content) => {
+    if (content.querySelector(".unlist, li.post, .portal-cleaner-news-empty")) {
+      return;
+    }
+
+    const text = (content.textContent ?? "").replace(/\s+/g, " ").trim();
+
+    if (!text) {
+      return;
+    }
+
+    content.textContent = "";
+
+    const emptyMessage = document.createElement("div");
+    emptyMessage.className = "portal-cleaner-news-empty";
+    emptyMessage.textContent = text;
+    content.appendChild(emptyMessage);
+  });
 
   footers.forEach((footer) => {
     // Moodle renders the news archive footer as: <a>Older topics</a> ...
@@ -494,6 +514,14 @@ function enhanceNewsBlock() {
   });
 
   applyNewsBlockAccessibility();
+}
+
+function enhanceRecentActivityBlock() {
+  const reportLinks = document.querySelectorAll(".block_recent_activity.sideblock .activityhead a");
+
+  reportLinks.forEach((link) => {
+    link.textContent = "SEE ALL EVENTS";
+  });
 }
 
 /**
@@ -721,6 +749,7 @@ function enhancePage() {
   enhanceCalendarMonthLabel();
   enhanceMenuNavigation();
   enhanceNewsBlock();
+  enhanceRecentActivityBlock();
   rebuildHeader();
   removeEmptyTableRows();
   cleanupLegacySpacers();

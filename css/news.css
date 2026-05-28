@@ -12,6 +12,24 @@ html.portal-cleaner-active .block_news_items.sideblock {
 
 html.portal-cleaner-active .block_news_items .content {
   padding: 0.5rem !important;
+  color: var(--pc-text) !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  font-style: normal !important;
+  line-height: 1.45 !important;
+  text-align: left !important;
+}
+
+html.portal-cleaner-active .block_news_items .portal-cleaner-news-empty {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0.55rem 0.5rem !important;
+  color: var(--pc-text) !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  font-style: normal !important;
+  line-height: 1.45 !important;
+  text-align: left !important;
 }
 
 html.portal-cleaner-active .block_news_items .unlist {

@@ -14,19 +14,27 @@ html.portal-cleaner-active .portal-cleaner-file-tools {
 html.portal-cleaner-active .portal-cleaner-file-tool-button {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 0.42rem !important;
-  min-height: 2.1rem !important;
+  gap: 0.5rem !important;
+  min-height: 2.55rem !important;
   max-width: 100% !important;
-  padding: 0.38rem 0.64rem !important;
-  border: 1px solid rgba(37, 99, 235, 0.18) !important;
-  border-radius: 999px !important;
+  padding: 0.56rem 0.72rem !important;
+  border: 1px solid rgba(131, 149, 239, 0.78) !important;
+  border-radius: 8px !important;
   background: #ffffff !important;
   color: var(--pc-primary-strong) !important;
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08) !important;
+  box-shadow: none !important;
   cursor: pointer !important;
   font-size: 0.72rem !important;
   font-weight: 800 !important;
   line-height: 1 !important;
+  transition: box-shadow 160ms ease, transform 160ms ease !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-file-tool-button:hover,
+html.portal-cleaner-active .portal-cleaner-file-tool-button:focus-visible {
+  box-shadow: 0 5px 8px rgba(15, 23, 42, 0.14) !important;
+  outline: none !important;
+  transform: translateX(1.5px) !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-file-tool-icon {
@@ -75,15 +83,17 @@ html.portal-cleaner-active .portal-cleaner-files-backdrop {
 }
 
 html.portal-cleaner-active .portal-cleaner-files-dialog {
+  --portal-cleaner-files-check-column: 1.55rem !important;
+  --portal-cleaner-files-meta-column: 2.35rem !important;
   position: relative !important;
   z-index: 1 !important;
   display: grid !important;
-  grid-template-rows: auto auto auto minmax(0, 1fr) !important;
-  gap: 0.9rem !important;
+  grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+  gap: 0 !important;
   width: min(56rem, calc(100vw - 2rem)) !important;
   max-height: min(42rem, calc(100vh - 2rem)) !important;
   overflow: hidden !important;
-  padding: 1rem !important;
+  padding: 0 !important;
   border: 1px solid rgba(226, 232, 240, 0.95) !important;
   border-radius: 14px !important;
   background: #ffffff !important;
@@ -91,10 +101,24 @@ html.portal-cleaner-active .portal-cleaner-files-dialog {
 }
 
 html.portal-cleaner-active .portal-cleaner-files-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(10.4rem, auto) !important;
+  align-items: start !important;
+  gap: 1.25rem !important;
+  padding: 1rem 1rem 0.85rem !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.88) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-heading {
+  min-width: 0 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-header-controls {
   display: flex !important;
-  align-items: flex-start !important;
-  justify-content: space-between !important;
-  gap: 1rem !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 0.45rem !important;
+  min-width: max-content !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-title {
@@ -118,39 +142,50 @@ html.portal-cleaner-active .portal-cleaner-files-close {
   flex: 0 0 auto !important;
   display: inline-grid !important;
   place-items: center !important;
-  width: 2rem !important;
-  height: 2rem !important;
-  border: 1px solid rgba(226, 232, 240, 0.95) !important;
-  border-radius: 999px !important;
-  background: #f8fafc !important;
+  width: 1.7rem !important;
+  height: 1.7rem !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 7px !important;
+  background: transparent !important;
   color: #475569 !important;
   cursor: pointer !important;
-  font-size: 0.85rem !important;
+  font-size: 1.05rem !important;
   font-weight: 900 !important;
-  line-height: 1 !important;
+  line-height: 1.7rem !important;
+  text-align: center !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-close:hover,
+html.portal-cleaner-active .portal-cleaner-files-close:focus-visible {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  outline: none !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-actions {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 0.75rem !important;
-}
-
-html.portal-cleaner-active .portal-cleaner-files-action {
-  display: grid !important;
-  align-content: start !important;
-  gap: 0.35rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
   min-width: 0 !important;
-  padding: 0.72rem !important;
-  border: 1px solid rgba(226, 232, 240, 0.95) !important;
-  border-radius: 10px !important;
+  min-height: 5.4rem !important;
+  padding: 1rem 1.1rem !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.95) !important;
   background: #f8fbff !important;
 }
 
+html.portal-cleaner-active .portal-cleaner-files-action-status {
+  display: grid !important;
+  gap: 0.28rem !important;
+  min-width: 0 !important;
+}
+
 html.portal-cleaner-active .portal-cleaner-files-action-button {
-  justify-self: start !important;
-  min-height: 2.2rem !important;
-  padding: 0.5rem 0.82rem !important;
+  flex: 0 0 auto !important;
+  align-self: center !important;
+  min-height: 2.6rem !important;
+  padding: 0.65rem 1.05rem !important;
   border: none !important;
   border-radius: 999px !important;
   background: #2563eb !important;
@@ -158,6 +193,12 @@ html.portal-cleaner-active .portal-cleaner-files-action-button {
   cursor: pointer !important;
   font-size: 0.72rem !important;
   font-weight: 850 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-action-button:not(:disabled):hover,
+html.portal-cleaner-active .portal-cleaner-files-action-button:not(:disabled):focus-visible {
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.24) !important;
+  outline: none !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-option {
@@ -176,7 +217,7 @@ html.portal-cleaner-active .portal-cleaner-files-option input {
   width: 1rem !important;
   height: 1rem !important;
   margin: 0 !important;
-  accent-color: #0f766e !important;
+  accent-color: #111827 !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-option:has(input:disabled) {
@@ -189,12 +230,39 @@ html.portal-cleaner-active .portal-cleaner-files-action-button:disabled {
   opacity: 0.52 !important;
 }
 
+/* The browser area owns selection affordances, keeping "Select all" visually
+   tied to the file inventory instead of the download settings footer. */
+html.portal-cleaner-active .portal-cleaner-files-browser {
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select-all-label {
+  grid-template-columns: minmax(0, 1fr) var(--portal-cleaner-files-check-column) !important;
+  justify-self: end !important;
+  width: calc(10.4rem + 1rem) !important;
+  padding-right: 1.25rem !important;
+  white-space: nowrap !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select-all-label span {
+  justify-self: end !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select-all-control {
+  justify-self: end !important;
+}
+
+/* The list is the only tall scroll region. The modal header, conversion
+   progress, and footer remain visible while reviewing files. */
 html.portal-cleaner-active .portal-cleaner-files-list {
   display: grid !important;
   gap: 0.8rem !important;
   min-height: 0 !important;
   overflow: auto !important;
-  padding-right: 0.25rem !important;
+  padding: 0.9rem 1rem 1rem !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-group {
@@ -203,15 +271,19 @@ html.portal-cleaner-active .portal-cleaner-files-group {
 }
 
 html.portal-cleaner-active .portal-cleaner-files-group-header {
-  display: flex !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) var(--portal-cleaner-files-meta-column) var(--portal-cleaner-files-check-column) !important;
   align-items: center !important;
-  justify-content: space-between !important;
-  gap: 0.7rem !important;
+  gap: 0.6rem !important;
+  padding: 0 0.6rem !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-group-title {
-  justify-self: start !important;
+  grid-column: 1 !important;
   margin: 0 !important;
+  max-width: 10rem !important;
+  min-width: min(7.2rem, 100%) !important;
+  padding-inline: 1.5rem !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-group-list,
@@ -227,10 +299,17 @@ html.portal-cleaner-active .portal-cleaner-files-conversion-list:empty {
   display: none !important;
 }
 
+html.portal-cleaner-active .portal-cleaner-files-conversion-list:not(:empty) {
+  padding: 0.75rem 1rem !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.7) !important;
+  background: #ffffff !important;
+  overflow: auto !important;
+}
+
 html.portal-cleaner-active .portal-cleaner-files-item,
 html.portal-cleaner-active .portal-cleaner-files-conversion-item {
   display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr) auto auto !important;
+  grid-template-columns: auto minmax(0, 1fr) var(--portal-cleaner-files-meta-column) var(--portal-cleaner-files-check-column) !important;
   gap: 0.6rem !important;
   align-items: center !important;
   min-width: 0 !important;
@@ -253,21 +332,97 @@ html.portal-cleaner-active .portal-cleaner-files-conversion-item {
 html.portal-cleaner-active .portal-cleaner-files-select-label {
   display: inline-grid !important;
   place-items: center !important;
-  width: 1.55rem !important;
-  height: 1.55rem !important;
+  width: 1.72rem !important;
+  height: 1.72rem !important;
+  border-radius: 7px !important;
   cursor: pointer !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select-label:hover {
+  background: #e5e7eb !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  display: inline-grid !important;
+  place-items: center !important;
   width: 1.05rem !important;
   height: 1.05rem !important;
   margin: 0 !important;
-  accent-color: #2563eb !important;
+  border: 1.5px solid #94a3b8 !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
   cursor: pointer !important;
 }
 
+html.portal-cleaner-active .portal-cleaner-files-select:hover,
+html.portal-cleaner-active .portal-cleaner-files-select:focus-visible,
+html.portal-cleaner-active .portal-cleaner-files-select:checked,
+html.portal-cleaner-active .portal-cleaner-files-select:indeterminate {
+  border-color: #111827 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.28) !important;
+  outline-offset: 2px !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select:checked {
+  background: #111827 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select:checked::after {
+  width: 0.34rem !important;
+  height: 0.58rem !important;
+  border: solid #ffffff !important;
+  border-width: 0 2px 2px 0 !important;
+  content: "" !important;
+  transform: rotate(45deg) translateY(-0.04rem) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-select:indeterminate::after {
+  width: 0.55rem !important;
+  height: 0.12rem !important;
+  border-radius: 999px !important;
+  background: currentColor !important;
+  color: #111827 !important;
+  content: "" !important;
+}
+
 html.portal-cleaner-active .portal-cleaner-files-category-select {
-  accent-color: #0f766e !important;
+  border-color: #475569 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-category-select:hover,
+html.portal-cleaner-active .portal-cleaner-files-category-select:focus-visible,
+html.portal-cleaner-active .portal-cleaner-files-category-select:checked,
+html.portal-cleaner-active .portal-cleaner-files-category-select:indeterminate,
+html.portal-cleaner-active .portal-cleaner-files-select-all-option:hover,
+html.portal-cleaner-active .portal-cleaner-files-select-all-option:focus-visible,
+html.portal-cleaner-active .portal-cleaner-files-select-all-option:checked,
+html.portal-cleaner-active .portal-cleaner-files-select-all-option:indeterminate {
+  border-color: #111827 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-category-select-label,
+html.portal-cleaner-active .portal-cleaner-files-item-select-label {
+  grid-column: 4 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-convert-control {
+  width: 1.72rem !important;
+  height: 1.72rem !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item-select {
+  border-color: #cbd5e1 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-files-item-select:hover,
+html.portal-cleaner-active .portal-cleaner-files-item-select:focus-visible,
+html.portal-cleaner-active .portal-cleaner-files-item-select:checked {
+  border-color: #111827 !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-files-item-icon {
@@ -337,11 +492,31 @@ html.portal-cleaner-active .portal-cleaner-files-conversion-item[data-portal-cle
   html.portal-cleaner-active .portal-cleaner-files-dialog {
     width: calc(100vw - 1rem) !important;
     max-height: calc(100vh - 1rem) !important;
-    padding: 0.82rem !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-header {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-header-controls {
+    align-items: flex-start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-close {
+    align-self: flex-end !important;
   }
 
   html.portal-cleaner-active .portal-cleaner-files-actions {
-    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+    flex-direction: column !important;
+    min-height: 6rem !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-action-button {
+    width: 100% !important;
   }
 
   html.portal-cleaner-active .portal-cleaner-files-conversion-item {
@@ -349,7 +524,7 @@ html.portal-cleaner-active .portal-cleaner-files-conversion-item[data-portal-cle
   }
 
   html.portal-cleaner-active .portal-cleaner-files-item {
-    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    grid-template-columns: auto minmax(0, 1fr) var(--portal-cleaner-files-check-column) !important;
   }
 
   html.portal-cleaner-active .portal-cleaner-files-item-meta {
@@ -359,6 +534,18 @@ html.portal-cleaner-active .portal-cleaner-files-conversion-item[data-portal-cle
   html.portal-cleaner-active .portal-cleaner-files-item-select-label {
     grid-column: 3 !important;
     grid-row: 1 / span 2 !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-group-header {
+    grid-template-columns: auto minmax(0, 1fr) var(--portal-cleaner-files-check-column) !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-group-title {
+    grid-column: 1 !important;
+  }
+
+  html.portal-cleaner-active .portal-cleaner-files-category-select-label {
+    grid-column: 3 !important;
   }
 
   html.portal-cleaner-active .portal-cleaner-files-item-meta,

@@ -20,6 +20,8 @@
         "css/directory.css",
         "css/courses.css",
         "css/calendar.css",
+        "css/upcoming-events.css",
+        "css/recent-activity.css",
         "css/menu.css",
         "css/news.css",
         "css/login.css",
