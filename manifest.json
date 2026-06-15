@@ -9,6 +9,12 @@
     "https://graph.microsoft.com/*",
     "https://login.microsoftonline.com/*"
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["campus-image.jpg"],
+      "matches": ["https://ewble-sl.utar.edu.my/*"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["https://ewble-sl.utar.edu.my/*"],

@@ -24,6 +24,20 @@ function setCleanerState(enabled) {
   document.documentElement.classList.toggle(DISABLED_CLASS, !enabled);
 }
 
+function setLoginCampusImageUrl() {
+  if (document.documentElement.dataset.portalCleanerPage !== "login") {
+    return;
+  }
+
+  const runtimeUrl = globalThis.chrome?.runtime?.getURL?.("campus-image.jpg");
+
+  if (!runtimeUrl) {
+    return;
+  }
+
+  document.documentElement.style.setProperty("--portal-cleaner-campus-image", `url("${runtimeUrl}")`);
+}
+
 // Small proof-of-feasibility tweak: rename the default login heading to
 // something a bit clearer without changing the actual login flow.
 function relabelLoginPage() {
@@ -741,6 +755,7 @@ function enhanceBulkDownloadTools() {
 // single place that wires together per-page UI upgrades.
 function enhancePage() {
   addPageMarkers();
+  setLoginCampusImageUrl();
   relabelLoginPage();
   hideLegacyLoginBodyText();
   normalizeLoginChrome();
