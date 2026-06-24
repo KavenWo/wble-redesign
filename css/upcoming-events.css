@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Upcoming Events Module
+   ==========================================================================
+   Refreshes Moodle's right-column Upcoming Events block with compact event
+   rows and quiet empty states while hiding legacy calendar-management links.
+   ========================================================================== */
+
+html.portal-cleaner-active .block_calendar_upcoming.sideblock {
+  margin: 0 !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .content {
+  padding: 0.5rem !important;
+  color: var(--pc-text) !important;
+  font-size: 0.65rem !important;
+  line-height: 1.5 !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .event {
+  display: block !important;
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0.55rem 0.5rem !important;
+  border: 1px solid transparent !important;
+  border-bottom-color: rgba(148, 163, 184, 0.22) !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--pc-text) !important;
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .event:last-of-type {
+  border-bottom-color: transparent !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .event:hover,
+html.portal-cleaner-active .block_calendar_upcoming .event:focus-within {
+  border-color: var(--pc-line) !important;
+  background: var(--pc-surface) !important;
+  box-shadow: var(--pc-shadow) !important;
+  transform: translateX(2px) !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .event .icon,
+html.portal-cleaner-active .block_calendar_upcoming .event .icon img {
+  display: none !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .event > a {
+  display: block !important;
+  margin: 0 !important;
+  color: var(--pc-text) !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+  overflow-wrap: anywhere !important;
+  text-decoration: none !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .event > a:hover,
+html.portal-cleaner-active .block_calendar_upcoming .event > a:focus-visible {
+  color: var(--pc-primary) !important;
+  outline: none !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .date {
+  display: block !important;
+  margin: 0.35rem 0 0 !important;
+  color: var(--pc-muted) !important;
+  font-size: 0.6rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .date a {
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  text-decoration: none !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .date a:hover,
+html.portal-cleaner-active .block_calendar_upcoming .date a:focus-visible {
+  color: var(--pc-primary) !important;
+  outline: none !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .post {
+  margin: 0 !important;
+  padding: 0.55rem 0.5rem !important;
+  color: var(--pc-text) !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  font-style: normal !important;
+  line-height: 1.45 !important;
+  text-align: left !important;
+}
+
+html.portal-cleaner-active .block_calendar_upcoming .footer {
+  display: none !important;
+}

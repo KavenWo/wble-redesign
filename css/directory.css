@@ -1,0 +1,127 @@
+/* ==========================================================================
+   Directory Trail Module
+   ==========================================================================
+   Handles the course directory path shown above page content, such as
+   "WBLE-SL > UEEA2273-202602-EZZ". This module keeps Moodle's original
+   breadcrumb DOM in place and upgrades only the visual language.
+   ========================================================================== */
+
+/* Directory Layout
+   Keep the path aligned with the content surface while avoiding a separate
+   card treatment. The legacy table remains, but visually behaves like a slim
+   page-level toolbar. */
+html.portal-cleaner-active .navbar,
+html.portal-cleaner-active #header .navbar,
+html.portal-cleaner-active #header-home .navbar {
+  margin-bottom: 0 !important;
+  width: 90% !important;
+  margin-left: 5% !important;
+  min-height: auto !important;
+  display: block !important;
+  background: linear-gradient(180deg, var(--pc-surface) 0%, var(--pc-surface-alt) 100%) !important;
+  border: 1px solid var(--pc-line) !important;
+  border-bottom: none !important;
+  border-top-left-radius: var(--pc-radius) !important;
+  border-top-right-radius: var(--pc-radius) !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0.72rem 1.15rem !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+html.portal-cleaner-active table.navbar {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+html.portal-cleaner-active .navtrail,
+html.portal-cleaner-active .navigation {
+  margin: 0 auto 0.5rem !important;
+  width: 90% !important;
+  padding: 0 !important;
+}
+
+/* Directory Items
+   Use inline-flex so hover transforms affect only the active crumb, not the
+   whole row. Fixed line-height and modest font sizing prevent layout jumps. */
+html.portal-cleaner-active .breadcrumb ul {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0.28rem !important;
+}
+
+html.portal-cleaner-active .breadcrumb li {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.28rem !important;
+  min-height: 1.55rem !important;
+  font-family: var(--pc-font) !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  color: var(--pc-muted) !important;
+}
+
+html.portal-cleaner-active .breadcrumb li a {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 1.55rem !important;
+  color: var(--pc-text) !important;
+  font-weight: 650 !important;
+  text-decoration: none !important;
+  transform-origin: left center !important;
+  transition:
+    color 160ms ease,
+    transform 160ms ease,
+    text-shadow 160ms ease !important;
+}
+
+html.portal-cleaner-active .breadcrumb li a:hover,
+html.portal-cleaner-active .breadcrumb li a:focus-visible {
+  color: var(--pc-primary) !important;
+  text-decoration: none !important;
+  transform: translateY(-1px) !important;
+  text-shadow: 0 0 0.01px currentColor !important;
+}
+
+html.portal-cleaner-active .breadcrumb li a:focus-visible {
+  outline: 2px solid var(--pc-primary-soft) !important;
+  outline-offset: 3px !important;
+  border-radius: 6px !important;
+}
+
+/* Chevron Separator
+   Replace the chunky legacy arrow glyph with a drawn chevron so the directory
+   feels intentional even when Moodle emits different separator text. */
+html.portal-cleaner-active .breadcrumb .sep {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 0.86rem !important;
+  height: 1.55rem !important;
+  margin: 0 0.05rem !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  font-style: normal !important;
+}
+
+html.portal-cleaner-active .breadcrumb .sep::before {
+  content: "" !important;
+  width: 0.36rem !important;
+  height: 0.36rem !important;
+  border-top: 1.5px solid var(--pc-muted) !important;
+  border-right: 1.5px solid var(--pc-muted) !important;
+  opacity: 0.55 !important;
+  transform: rotate(45deg) !important;
+}
+
+html.portal-cleaner-active .breadcrumb .accesshide {
+  display: none !important;
+}

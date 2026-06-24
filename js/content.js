@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Content Module
    ==========================================================================
    Boots the page-side redesign experience on WBLE. It manages root state,
@@ -8,7 +8,6 @@
 
 const ROOT_CLASS = "portal-cleaner-active";
 const DISABLED_CLASS = "portal-cleaner-disabled";
-const BULK_DOWNLOAD_CONTAINER_ID = "portal-cleaner-download-panel";
 const MENU_CONTAINER_ID = "portal-cleaner-menu";
 const COURSE_TOOL_SOURCE_SELECTOR = ".block_participants.sideblock, .block_activity_modules.sideblock, .block_admin.sideblock";
 const COURSE_TOOL_HIDDEN_SOURCE = "utility-source";
@@ -23,6 +22,20 @@ let domReadyHookRegistered = false;
 function setCleanerState(enabled) {
   document.documentElement.classList.toggle(ROOT_CLASS, enabled);
   document.documentElement.classList.toggle(DISABLED_CLASS, !enabled);
+}
+
+function setLoginCampusImageUrl() {
+  if (document.documentElement.dataset.portalCleanerPage !== "login") {
+    return;
+  }
+
+  const runtimeUrl = globalThis.chrome?.runtime?.getURL?.("campus-image.jpg");
+
+  if (!runtimeUrl) {
+    return;
+  }
+
+  document.documentElement.style.setProperty("--portal-cleaner-campus-image", `url("${runtimeUrl}")`);
 }
 
 // Small proof-of-feasibility tweak: rename the default login heading to
@@ -244,6 +257,47 @@ function setupCourseToggle() {
   list.dataset.portalCleanerToggleInitialized = "true";
 }
 
+// Shortens Moodle's mini-calendar month label from "April 2026" to "APR 2026"
+// so the compact sidebar header reads cleanly without needing wider controls.
+function enhanceCalendarMonthLabel() {
+  const monthLink = document.querySelector(".block_calendar_month .calendar-controls .current a");
+
+  if (!monthLink || monthLink.dataset.portalCleanerEnhanced === "true") {
+    return;
+  }
+
+  const originalLabel = (monthLink.textContent ?? "").replace(/\s+/g, " ").trim();
+  const match = originalLabel.match(/^([A-Za-z]+)\s+(\d{4})$/);
+
+  if (!match) {
+    return;
+  }
+
+  const monthNames = {
+    january: "JAN",
+    february: "FEB",
+    march: "MAR",
+    april: "APR",
+    may: "MAY",
+    june: "JUN",
+    july: "JUL",
+    august: "AUG",
+    september: "SEP",
+    october: "OCT",
+    november: "NOV",
+    december: "DEC"
+  };
+  const shortMonth = monthNames[match[1].toLowerCase()];
+
+  if (!shortMonth) {
+    return;
+  }
+
+  monthLink.dataset.portalCleanerEnhanced = "true";
+  monthLink.dataset.portalCleanerOriginalLabel = originalLabel;
+  monthLink.textContent = `${shortMonth} ${match[2]}`;
+}
+
 function getMenuIcon(label) {
   const normalized = label.toLowerCase();
   const icons = {
@@ -391,7 +445,27 @@ function applyNewsBlockAccessibility() {
 // original anchor target in the DOM for a reversible enhancement.
 function enhanceNewsBlock() {
   const posts = document.querySelectorAll(".block_news_items.sideblock li.post");
+  const contents = document.querySelectorAll(".block_news_items.sideblock .content");
   const footers = document.querySelectorAll(".block_news_items.sideblock .footer");
+
+  contents.forEach((content) => {
+    if (content.querySelector(".unlist, li.post, .portal-cleaner-news-empty")) {
+      return;
+    }
+
+    const text = (content.textContent ?? "").replace(/\s+/g, " ").trim();
+
+    if (!text) {
+      return;
+    }
+
+    content.textContent = "";
+
+    const emptyMessage = document.createElement("div");
+    emptyMessage.className = "portal-cleaner-news-empty";
+    emptyMessage.textContent = text;
+    content.appendChild(emptyMessage);
+  });
 
   footers.forEach((footer) => {
     // Moodle renders the news archive footer as: <a>Older topics</a> ...
@@ -454,6 +528,14 @@ function enhanceNewsBlock() {
   });
 
   applyNewsBlockAccessibility();
+}
+
+function enhanceRecentActivityBlock() {
+  const reportLinks = document.querySelectorAll(".block_recent_activity.sideblock .activityhead a");
+
+  reportLinks.forEach((link) => {
+    link.textContent = "SEE ALL EVENTS";
+  });
 }
 
 /**
@@ -556,6 +638,13 @@ function rebuildHeader() {
   const profileUrl = links[0].href;
   const userName = links[0].textContent?.trim() ?? "";
   const logoutUrl = links[1].href;
+  const initials = userName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
 
   const newHeader = document.createElement("div");
   newHeader.className = "portal-cleaner-header-new";
@@ -568,7 +657,7 @@ function rebuildHeader() {
   logoLink.href = "https://ewble-sl.utar.edu.my/";
   logoLink.className = "portal-cleaner-header-logo";
   const logoImg = document.createElement("img");
-  logoImg.src = "https://upload.wikimedia.org/wikipedia/commons/b/b0/UTAR_LOGO_30122025.png";
+  logoImg.src = chrome.runtime.getURL("utar-logo.png");
   logoImg.alt = "UTAR Logo";
   logoLink.appendChild(logoImg);
   container.appendChild(logoLink);
@@ -577,159 +666,69 @@ function rebuildHeader() {
   const userActions = document.createElement("div");
   userActions.className = "portal-cleaner-header-actions";
 
-  const nameLink = document.createElement("a");
-  nameLink.href = profileUrl;
-  nameLink.className = "portal-cleaner-header-name";
-  nameLink.textContent = userName;
-  userActions.appendChild(nameLink);
+  const nameText = document.createElement("span");
+  nameText.className = "portal-cleaner-header-name";
+  nameText.textContent = userName;
+  userActions.appendChild(nameText);
 
-  const logoutBtn = document.createElement("a");
-  logoutBtn.href = logoutUrl;
-  logoutBtn.className = "portal-cleaner-header-logout";
-  logoutBtn.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-    Logout
-  `;
-  userActions.appendChild(logoutBtn);
+  const menuWrap = document.createElement("div");
+  menuWrap.className = "portal-cleaner-profile-menu";
+
+  const menuButton = document.createElement("button");
+  menuButton.type = "button";
+  menuButton.className = "portal-cleaner-profile-trigger";
+  menuButton.setAttribute("aria-label", "Open user menu");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.textContent = initials || "U";
+  menuWrap.appendChild(menuButton);
+
+  const menu = document.createElement("div");
+  menu.className = "portal-cleaner-profile-dropdown";
+  menu.setAttribute("role", "menu");
+
+  const profileLink = document.createElement("a");
+  profileLink.href = profileUrl;
+  profileLink.className = "portal-cleaner-profile-menu-item";
+  profileLink.setAttribute("role", "menuitem");
+  profileLink.textContent = "Profile";
+  menu.appendChild(profileLink);
+
+  const logoutLink = document.createElement("a");
+  logoutLink.href = logoutUrl;
+  logoutLink.className = "portal-cleaner-profile-menu-item portal-cleaner-profile-menu-item-danger";
+  logoutLink.setAttribute("role", "menuitem");
+  logoutLink.textContent = "Log Out";
+  menu.appendChild(logoutLink);
+
+  menuWrap.appendChild(menu);
+  userActions.appendChild(menuWrap);
+
+  const closeMenu = () => {
+    menuWrap.classList.remove("is-open");
+    menuButton.setAttribute("aria-expanded", "false");
+  };
+
+  menuButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const isOpen = menuWrap.classList.toggle("is-open");
+    menuButton.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!menuWrap.contains(event.target)) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+  });
 
   container.appendChild(userActions);
   newHeader.appendChild(container);
   header.appendChild(newHeader);
-}
-
-function updateBulkDownloadStatus(panel, message, tone) {
-  const status = panel?.querySelector(".portal-cleaner-download-status");
-
-  if (!status) {
-    return;
-  }
-
-  status.textContent = message;
-  status.dataset.portalCleanerTone = tone ?? "neutral";
-}
-
-function triggerZipDownload(blob, courseFolderName) {
-  const archiveBaseName =
-    window.PortalCleanerResourceDiscovery?.slugifyPathSegment(courseFolderName, "Course Files") ??
-    "Course Files";
-  const downloadLink = document.createElement("a");
-  const objectUrl = URL.createObjectURL(blob);
-
-  downloadLink.href = objectUrl;
-  downloadLink.download = `${archiveBaseName}.zip`;
-  downloadLink.style.display = "none";
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  downloadLink.remove();
-
-  window.setTimeout(() => {
-    URL.revokeObjectURL(objectUrl);
-  }, 1000);
-}
-
-// Render one additive bulk-download panel near the weekly resources without
-// disturbing the original Moodle markup underneath.
-function renderBulkDownloadPanel(discovery) {
-  const firstWeekContent = document.querySelector('tr.section.main[id^="section-"] > td.content');
-
-  if (!firstWeekContent) {
-    return;
-  }
-
-  let panel = document.getElementById(BULK_DOWNLOAD_CONTAINER_ID);
-
-  if (!panel) {
-    panel = document.createElement("section");
-    panel.id = BULK_DOWNLOAD_CONTAINER_ID;
-    panel.className = "portal-cleaner-download-panel";
-
-    const textWrap = document.createElement("div");
-    textWrap.className = "portal-cleaner-download-copy";
-
-    const title = document.createElement("h3");
-    title.className = "portal-cleaner-download-title";
-    title.textContent = "Bulk download";
-    textWrap.appendChild(title);
-
-    const description = document.createElement("p");
-    description.className = "portal-cleaner-download-description";
-    textWrap.appendChild(description);
-
-    const actions = document.createElement("div");
-    actions.className = "portal-cleaner-download-actions";
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "portal-cleaner-download-button";
-    button.textContent = "Download all files";
-    actions.appendChild(button);
-
-    const status = document.createElement("p");
-    status.className = "portal-cleaner-download-status";
-    status.setAttribute("aria-live", "polite");
-    actions.appendChild(status);
-
-    panel.appendChild(textWrap);
-    panel.appendChild(actions);
-    firstWeekContent.prepend(panel);
-  }
-
-  const description = panel.querySelector(".portal-cleaner-download-description");
-  const button = panel.querySelector(".portal-cleaner-download-button");
-
-  if (!description || !(button instanceof HTMLButtonElement)) {
-    return;
-  }
-
-  const downloadableCount = discovery.downloadable.length;
-  const skippedCount = discovery.skipped.length;
-  description.textContent = downloadableCount > 0
-    ? `Package ${downloadableCount} course file${downloadableCount === 1 ? "" : "s"} into one ZIP download. ${skippedCount > 0 ? `${skippedCount} non-file link${skippedCount === 1 ? " was" : "s were"} skipped.` : ""}`
-    : `No downloadable course files were found on this page. ${skippedCount > 0 ? `${skippedCount} non-file link${skippedCount === 1 ? " was" : "s were"} skipped.` : ""}`;
-
-  button.disabled = downloadableCount === 0;
-
-  if (panel.dataset.portalCleanerDownloadBound === "true") {
-    return;
-  }
-
-  panel.dataset.portalCleanerDownloadBound = "true";
-
-  button.addEventListener("click", async () => {
-    if (button.disabled) {
-      return;
-    }
-
-    button.disabled = true;
-    updateBulkDownloadStatus(panel, `Packaging ${discovery.downloadable.length} file${discovery.downloadable.length === 1 ? "" : "s"} into one ZIP...`, "neutral");
-
-    try {
-      const response = await window.PortalCleanerZipBuilder?.buildArchive(discovery.downloadable);
-
-      if (!response) {
-        updateBulkDownloadStatus(panel, "ZIP builder is not available on this page.", "error");
-        return;
-      }
-
-      if (!response.ok) {
-        const failedCount = response?.results?.filter((result) => !result.ok).length ?? 0;
-        const failureContext = failedCount > 0 ? ` ${failedCount} file request${failedCount === 1 ? "" : "s"} failed.` : "";
-        updateBulkDownloadStatus(panel, `ZIP download could not be created.${failureContext}`, "error");
-        return;
-      }
-
-      triggerZipDownload(response.blob, discovery.courseFolderName);
-      const successCount = response.results.filter((result) => result.ok).length;
-      const failureCount = response.results.length - successCount;
-      const archiveName = `${discovery.courseFolderName}.zip`;
-      const suffix = failureCount > 0 ? ` ${failureCount} file${failureCount === 1 ? "" : "s"} could not be added.` : "";
-      updateBulkDownloadStatus(panel, `${successCount} file${successCount === 1 ? "" : "s"} packed into ${archiveName}.${suffix}`, failureCount > 0 ? "warning" : "success");
-    } catch (error) {
-      updateBulkDownloadStatus(panel, `ZIP download failed: ${error instanceof Error ? error.message : "unknown error"}.`, "error");
-    } finally {
-      button.disabled = false;
-    }
-  });
 }
 
 // Discovery stays outside content.js so future selection UI can reuse the same
@@ -749,20 +748,23 @@ function enhanceBulkDownloadTools() {
     return;
   }
 
-  renderBulkDownloadPanel(discovery);
+  window.PortalCleanerFileTools?.render(discovery);
 }
 
 // Central hook for lightweight page-specific enhancements. Keep this as the
 // single place that wires together per-page UI upgrades.
 function enhancePage() {
   addPageMarkers();
+  setLoginCampusImageUrl();
   relabelLoginPage();
   hideLegacyLoginBodyText();
   normalizeLoginChrome();
   simplifyLoginContent();
   enhanceCourseListBlock();
+  enhanceCalendarMonthLabel();
   enhanceMenuNavigation();
   enhanceNewsBlock();
+  enhanceRecentActivityBlock();
   rebuildHeader();
   removeEmptyTableRows();
   cleanupLegacySpacers();
@@ -807,3 +809,4 @@ window.PortalCleanerApp = {
     registerDomReadyHook();
   }
 };
+

@@ -20,8 +20,33 @@ function cleanDiscoveredFileName(name) {
     .trim();
 }
 
-function classifyDiscoveredCategory(name, item) {
-  const normalizedName = (name ?? "").toLowerCase();
+function isPlaceholderLinkTitle(name) {
+  const normalizedName = normalizeResourceText(name).toLowerCase();
+
+  return /^https?:\/\/(www\.)?moodle\.org\/[\d.]+$/iu.test(normalizedName) ||
+    /^https?:\/\/[^/\s]+\/[\d.]+$/iu.test(normalizedName) ||
+    /^(?:open link|click here|here|link|download|file)$/iu.test(normalizedName);
+}
+
+function titleCaseFileName(name) {
+  return normalizeResourceText(name)
+    .split(" ")
+    .map((word) => {
+      if (/^[IVXLCDM]+$/u.test(word.toUpperCase())) {
+        return word.toUpperCase();
+      }
+
+      if (/^\d+[a-z]?$/iu.test(word)) {
+        return word;
+      }
+
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+}
+
+function classifyDiscoveredCategory(name, item, hrefText = "") {
+  const normalizedName = `${name ?? ""} ${hrefText}`.toLowerCase();
 
   const rules = [
     { type: "assignment", keywords: ["assignment", "submission link"] },
@@ -57,12 +82,44 @@ function getSourceText(item, linkText, href) {
   const hiddenText = item?.querySelector(".accesshide")?.textContent ?? "";
   const iconSource = item?.querySelector(".activityicon")?.getAttribute("src") ?? "";
 
-  return `${hiddenText} ${iconSource} ${linkText} ${href}`.toLowerCase();
+  return `${hiddenText} ${iconSource} ${linkText} ${href} ${item?.textContent ?? ""}`.toLowerCase();
+}
+
+function getCleanLinkTitle(link) {
+  const originalContent = link.querySelector(".portal-cleaner-original-content");
+
+  if (originalContent) {
+    const originalClone = originalContent.cloneNode(true);
+    originalClone.querySelectorAll(".accesshide").forEach((node) => {
+      node.remove();
+    });
+
+    const originalTitle = normalizeResourceText(originalClone.textContent);
+
+    if (originalTitle) {
+      return originalTitle;
+    }
+  }
+
+  const clone = link.cloneNode(true);
+
+  clone.querySelectorAll(".accesshide, .portal-cleaner-original-content, .portal-cleaner-file-card-content").forEach((node) => {
+    node.remove();
+  });
+  clone.querySelectorAll("img, svg").forEach((node) => {
+    node.remove();
+  });
+
+  return normalizeResourceText(clone.textContent);
 }
 
 // We intentionally keep the first pass strict: only formats that behave like
 // real downloadable files should enter the ZIP flow.
 function detectFormat(sourceText) {
+  if (sourceText.includes("powerpoint")) {
+    return "PPT";
+  }
+
   const formats = ["pdf", "docx", "pptx", "ppt", "xlsx", "xls", "zip", "doc", "rar", "7z"];
 
   for (const format of formats) {
@@ -84,6 +141,27 @@ function detectFormat(sourceText) {
   }
 
   return "LINK";
+}
+
+function getFormatIconSource(format) {
+  const normalizedFormat = String(format ?? "").toLowerCase();
+
+  if (!["pdf", "docx", "pptx", "ppt", "xlsx", "xls", "zip", "doc"].includes(normalizedFormat)) {
+    return "";
+  }
+
+  const iconFormat = normalizedFormat === "ppt" ? "powerpoint" : normalizedFormat;
+  return `https://ewble-sl.utar.edu.my/pix/f/${iconFormat}.gif`;
+}
+
+function getFileNameFromHref(url) {
+  const rawName = decodeURIComponent(url.pathname.split("/").pop() ?? "")
+    .replace(/\.[a-z0-9]{2,5}$/iu, "")
+    .replace(/[_-]+/g, " ");
+
+  const cleanedName = cleanDiscoveredFileName(rawName);
+
+  return titleCaseFileName(cleanedName);
 }
 
 function isSamePortalHost(url) {
@@ -143,12 +221,9 @@ function getCourseFolderName() {
 }
 
 function buildResourceRecord(item, link, source) {
-  const rawTitle = normalizeResourceText(link.textContent);
-
-  if (!rawTitle) {
-    return null;
-  }
-
+  // Moodle hides format labels in .accesshide, and our weekly enhancer adds
+  // richer card markup later. Clone and strip those nodes so titles stay like
+  // "Topic 4b slides" instead of "Topic 4b slides Powerpoint presentationPPT".
   let url;
 
   try {
@@ -157,16 +232,21 @@ function buildResourceRecord(item, link, source) {
     return null;
   }
 
-  const category = classifyDiscoveredCategory(rawTitle, item);
-  const title = cleanDiscoveredFileName(rawTitle) || rawTitle;
+  const rawTitle = getCleanLinkTitle(link);
+  const hrefTitle = getFileNameFromHref(url);
+  const cleanedTitle = cleanDiscoveredFileName(rawTitle);
+  const title = isPlaceholderLinkTitle(rawTitle) ? hrefTitle : cleanedTitle || hrefTitle || rawTitle;
+  const category = classifyDiscoveredCategory(title, item, url.href);
   const sourceText = getSourceText(item, rawTitle, url.href);
   const format = detectFormat(sourceText);
+  const iconSource = item?.querySelector(".activityicon")?.getAttribute("src") || getFormatIconSource(format);
   const { downloadable, reason } = resolveDownloadability(url, format, item);
 
   return {
     title,
     href: url.href,
     format,
+    iconSource,
     category,
     source,
     downloadable,
@@ -212,13 +292,14 @@ function discoverSummaryResources() {
   return resources;
 }
 
-// The page can expose the same resource through both the weekly card and the
-// summary area. Dedupe by URL and title so one file only enters the ZIP once.
+// The page can expose the same resource through both the summary area and the
+// generated UI. Dedupe by canonical URL so one file only enters the ZIP once
+// even when the two surfaces disagree about a title.
 function dedupeResources(resources) {
   const seen = new Set();
 
   return resources.filter((resource) => {
-    const key = `${resource.href}::${resource.title}`;
+    const key = resource.href;
 
     if (seen.has(key)) {
       return false;

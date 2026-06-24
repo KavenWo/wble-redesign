@@ -25,61 +25,143 @@ html.portal-cleaner-active .portal-cleaner-header-new {
 html.portal-cleaner-active .portal-cleaner-header-new {
   width: 100% !important;
   margin: 0 0 1rem !important;
-  padding: 0.75rem 0 0 !important;
+  min-height: 96px !important;
+  padding: 0.85rem 0 !important;
   display: flex !important;
   align-items: center !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-header-container {
+  position: relative !important;
   width: 90% !important;
-  height: 56px !important;
+  min-height: 60px !important;
   margin: 0 auto !important;
   padding: 0 0.5rem !important;
   display: flex !important;
-  justify-content: space-between !important;
+  justify-content: flex-end !important;
   align-items: center !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-header-logo {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-header-logo img {
-  height: 70px !important;
+  height: 92px !important;
   width: auto !important;
+  display: block !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-header-actions {
+  position: relative !important;
   display: flex !important;
   align-items: center !important;
-  gap: 1.25rem !important;
+  gap: 0.75rem !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-header-name {
-  color: #000000 !important;
-  font-weight: 500 !important;
-  font-size: 0.65rem !important;
-  text-decoration: none !important;
-  transition: text-decoration 150ms ease !important;
+  max-width: 16rem !important;
+  color: var(--pc-text) !important;
+  font-weight: 700 !important;
+  font-size: 0.72rem !important;
+  line-height: 1.2 !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-html.portal-cleaner-active .portal-cleaner-header-name:hover {
-  text-decoration: underline !important;
-}
-
-html.portal-cleaner-active .portal-cleaner-header-logout {
+html.portal-cleaner-active .portal-cleaner-profile-menu {
+  position: relative !important;
   display: flex !important;
   align-items: center !important;
-  gap: 0.4rem !important;
-  padding: 0.5rem 0.9rem !important;
-  border-radius: 8px !important;
-  background-color: #fef2f2 !important;
-  color: #dc2626 !important;
-  font-weight: 600 !important;
-  font-size: 0.65rem !important;
-  border: 1px solid #fee2e2 !important;
-  transition: all 150ms ease !important;
 }
 
-html.portal-cleaner-active .portal-cleaner-header-logout:hover {
-  background-color: #fee2e2 !important;
-  border-color: #fecaca !important;
+html.portal-cleaner-active .portal-cleaner-profile-trigger {
+  width: 2.4rem !important;
+  height: 2.4rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(37, 99, 235, 0.16) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%) !important;
+  color: var(--pc-primary-strong) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.1) !important;
+  cursor: pointer !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.04em !important;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-profile-trigger:hover,
+html.portal-cleaner-active .portal-cleaner-profile-trigger:focus-visible,
+html.portal-cleaner-active .portal-cleaner-profile-menu.is-open .portal-cleaner-profile-trigger {
+  border-color: rgba(37, 99, 235, 0.34) !important;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.05) !important;
+  outline: none !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-profile-dropdown {
+  position: absolute !important;
+  top: calc(100% + 0.55rem) !important;
+  right: 0 !important;
+  z-index: 20 !important;
+  min-width: 9.5rem !important;
+  display: grid !important;
+  gap: 0.15rem !important;
+  padding: 0.35rem !important;
+  border: 1px solid var(--pc-line) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.12) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-4px) !important;
+  transition: opacity 140ms ease, transform 140ms ease !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-profile-menu.is-open .portal-cleaner-profile-dropdown {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-profile-menu-item {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 2rem !important;
+  padding: 0.45rem 0.6rem !important;
+  border-radius: 8px !important;
+  color: var(--pc-text) !important;
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-decoration: none !important;
+  transition: color 140ms ease, background-color 140ms ease !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-profile-menu-item:hover,
+html.portal-cleaner-active .portal-cleaner-profile-menu-item:focus-visible {
+  background: var(--pc-primary-soft) !important;
+  color: var(--pc-primary-strong) !important;
+  outline: none !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-profile-menu-item-danger {
+  color: #dc2626 !important;
+}
+
+html.portal-cleaner-active .portal-cleaner-profile-menu-item-danger:hover,
+html.portal-cleaner-active .portal-cleaner-profile-menu-item-danger:focus-visible {
+  background: #fef2f2 !important;
+  color: #b91c1c !important;
 }

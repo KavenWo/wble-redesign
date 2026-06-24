@@ -9,6 +9,17 @@
 // Build ZIP archives on the page side so authenticated Moodle fetches can use
 // the active site session instead of the extension worker context.
 (function initPortalCleanerZipBuilder() {
+  const CATEGORY_FOLDER_NAMES = {
+    lecture: "Lecture",
+    tutorial: "Tutorial",
+    lab: "Lab",
+    assignment: "Assignment",
+    cover: "Cover",
+    reference: "Reference",
+    assessment: "Assessment",
+    results: "Results"
+  };
+
   function encodeUtf8(value) {
     return new TextEncoder().encode(value);
   }
@@ -42,6 +53,7 @@
     return table;
   })();
 
+  // Computes the checksum required by the ZIP file format for each stored file.
   function computeCrc32(bytes) {
     let crc = 0xFFFFFFFF;
 
@@ -52,6 +64,7 @@
     return (crc ^ 0xFFFFFFFF) >>> 0;
   }
 
+  // Encodes timestamps using the DOS date/time fields expected by ZIP headers.
   function createDosDateTimeParts(date) {
     const safeYear = Math.max(1980, date.getFullYear());
     const dosTime =
@@ -92,6 +105,41 @@
     return `${safeTitle}.${extension}`;
   }
 
+  // Builds the final ZIP entry path for a resource. Known categories get
+  // folder prefixes, while generic "file" resources stay at the archive root
+  // so uncategorized material remains visible to students.
+  function createArchivePath(resource, fileName) {
+    const category = String(resource?.category ?? "file").toLowerCase();
+    const folderName = CATEGORY_FOLDER_NAMES[category];
+
+    if (!folderName) {
+      return fileName;
+    }
+
+    return `${folderName}/${fileName}`;
+  }
+
+  // Deduplicates archive paths. Conversion can turn similarly named PPT/PPTX
+  // files into identical PDF names, and ZIP tools may hide shadowed entries.
+  function createUniquePath(path, usedPaths) {
+    const normalizedPath = String(path || "file").trim() || "file";
+    const dotIndex = normalizedPath.lastIndexOf(".");
+    const baseName = dotIndex > 0 ? normalizedPath.slice(0, dotIndex) : normalizedPath;
+    const extension = dotIndex > 0 ? normalizedPath.slice(dotIndex) : "";
+    let candidate = normalizedPath;
+    let suffix = 2;
+
+    while (usedPaths.has(candidate.toLowerCase())) {
+      candidate = `${baseName} (${suffix})${extension}`;
+      suffix += 1;
+    }
+
+    usedPaths.add(candidate.toLowerCase());
+    return candidate;
+  }
+
+  // Builds an uncompressed ZIP blob from prepared file entries. We store files
+  // instead of compressing them to keep the implementation dependency-free.
   function buildStoredZip(files) {
     const localFileChunks = [];
     const centralDirectoryChunks = [];
@@ -161,9 +209,41 @@
     ], { type: "application/zip" });
   }
 
-  // Fetch resources through the logged-in page context, collect the successful
-  // responses, and then package them into one ZIP archive for a single save.
-  async function buildArchive(resources) {
+  // Shared archive path for both fetched WBLE resources and generated PDFs.
+  // Callers can assemble mixed file sources, then hand them here for ZIP I/O.
+  function buildArchiveFromFiles(files, results = []) {
+    const usedPaths = new Set();
+    const archiveFiles = files
+      .filter((file) => file?.bytes?.length > 0)
+      .map((file) => {
+        const path = createUniquePath(file.path, usedPaths);
+
+        return {
+          path,
+          bytes: file.bytes,
+          crc32: computeCrc32(file.bytes)
+        };
+      });
+
+    if (archiveFiles.length === 0) {
+      return {
+        ok: false,
+        reason: "no-files-fetched",
+        results
+      };
+    }
+
+    return {
+      ok: true,
+      fileCount: archiveFiles.length,
+      results,
+      blob: buildStoredZip(archiveFiles)
+    };
+  }
+
+  // Fetches original WBLE resources and returns ZIP-ready file entries plus
+  // per-resource status. It does not build the ZIP so callers can mix sources.
+  async function collectResourceFiles(resources) {
     const files = [];
     const results = [];
 
@@ -188,16 +268,17 @@
 
         const bytes = new Uint8Array(await response.arrayBuffer());
         const fileName = sanitizeFileName(resource.title, resource.format, index);
+        const path = createArchivePath(resource, fileName);
         files.push({
-          path: fileName,
-          bytes,
-          crc32: computeCrc32(bytes)
+          path,
+          bytes
         });
         results.push({
           ok: true,
           title: resource.title,
           href: resource.href,
-          fileName
+          fileName,
+          path
         });
       } catch (error) {
         results.push({
@@ -209,23 +290,22 @@
       }
     }
 
-    if (files.length === 0) {
-      return {
-        ok: false,
-        reason: "no-files-fetched",
-        results
-      };
-    }
+    return { files, results };
+  }
 
-    return {
-      ok: true,
-      results,
-      blob: buildStoredZip(files)
-    };
+  // Backward-compatible one-step ZIP builder for callers that only need to
+  // package original WBLE files without converted/generated entries.
+  async function buildArchive(resources) {
+    const { files, results } = await collectResourceFiles(resources);
+
+    return buildArchiveFromFiles(files, results);
   }
 
   window.PortalCleanerZipBuilder = {
     buildArchive,
+    buildArchiveFromFiles,
+    collectResourceFiles,
+    createArchivePath,
     sanitizeFileName
   };
 })();

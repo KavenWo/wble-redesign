@@ -15,8 +15,15 @@ html.portal-cleaner-active .block {
   box-shadow: none !important;
 }
 
+html.portal-cleaner-active .block_course_list.sideblock {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
 html.portal-cleaner-active .block_course_list.sideblock .content {
   padding: 0.5rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
 }
 
 /* Keep the course selector available while reading long weekly pages. The
@@ -141,6 +148,8 @@ html.portal-cleaner-active .portal-cleaner-course-link {
   border: 1px solid transparent !important;
   background: transparent !important;
   color: var(--pc-text) !important;
+  width: 100% !important;
+  min-width: 0 !important;
   transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 

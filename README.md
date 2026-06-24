@@ -55,6 +55,7 @@ To keep the redesign flexible while preserving confidence in the original Moodle
 3. **Controller and redesign logic are separate**:
    - `controller.js` reads the saved toggle state and decides whether the redesign app should run.
    - `content.js` contains the redesign behavior itself.
+   - `file-tools.js` and `css/file-tools.css` own the course files pill, modal, ZIP action, and OneDrive conversion UI.
    - `background.js` handles the tab refresh flow when the user disables the redesign from the popup.
 4. **Page-load state is the source of truth**:
    - If the redesign is off when the page loads, the redesign app does not mount.
@@ -67,5 +68,13 @@ To keep the redesign flexible while preserving confidence in the original Moodle
    - CSS should remain the main source of truth for visibility, layout, and ordering.
    - Prefer layout techniques such as Flexbox `order` before reaching for JavaScript DOM movement.
 8. **Minimize JavaScript bloat**: Use JavaScript only when CSS cannot achieve the needed UX. JavaScript should focus on focused enhancement work such as DOM injection, semantic upgrades, or interaction behavior that styling alone cannot provide.
+
+## OneDrive PPTX-to-PDF Converter
+
+The extension can convert WBLE `PPT`/`PPTX` downloads into PDFs using the student's own Microsoft OneDrive and Microsoft Graph. This is extension-only; it does not require a backend server.
+
+UTAR/work/school Microsoft accounts may require administrator approval for third-party app consent. If sign-in is blocked, use a personal Microsoft account for the converter.
+
+Before testing conversion, create a Microsoft app registration and copy `local-config.example.js` to the ignored `local-config.js` file with your own client ID. See [ONEDRIVE_CONVERTER_SETUP.md](ONEDRIVE_CONVERTER_SETUP.md) for the setup steps and known limits.
 
 This architecture is meant to give contributors more freedom to improve UI and UX without carrying a large amount of toggle-off cleanup logic in every feature.

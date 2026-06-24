@@ -60,6 +60,29 @@ function shortenWeekDateLabel(label) {
   ).replace(/\s+/g, " ").trim();
 }
 
+function isNumericTopicOutlineRow(row, weekNumber) {
+  // Rare Moodle topic outlines do not provide date headers; treat their
+  // numeric left column as a W1/W2-style fallback without inventing dates.
+  const outlineTable = row.closest("table.topics");
+  const sideLabel = (row.querySelector("td.left.side")?.textContent ?? "").replace(/\s+/g, " ").trim();
+
+  return Boolean(outlineTable) && sideLabel === String(weekNumber);
+}
+
+function createTopicWeekHeader(row) {
+  const contentCell = row.querySelector("td.content");
+
+  if (!contentCell) {
+    return null;
+  }
+
+  const weekDates = document.createElement("h3");
+  weekDates.className = "weekdates";
+  contentCell.insertBefore(weekDates, contentCell.firstChild);
+
+  return weekDates;
+}
+
 // Rebuild each weekly date header so the week number becomes the first thing
 // students see while keeping the original date range intact.
 function enhanceWeekHeaders() {
@@ -72,10 +95,19 @@ function enhanceWeekHeaders() {
       return;
     }
 
-    const weekDates = row.querySelector(".weekdates");
+    let weekDates = row.querySelector(".weekdates");
+    const hasOriginalDateLabel = Boolean(weekDates);
 
     if (!weekDates) {
-      return;
+      if (!isNumericTopicOutlineRow(row, weekNumber)) {
+        return;
+      }
+
+      weekDates = createTopicWeekHeader(row);
+
+      if (!weekDates) {
+        return;
+      }
     }
 
     if (weekDates.dataset.portalCleanerWeeklyEnhanced === "true") {
@@ -91,10 +123,12 @@ function enhanceWeekHeaders() {
     badge.textContent = `W${weekNumber}`;
     weekDates.appendChild(badge);
 
-    const label = document.createElement("span");
-    label.className = "portal-cleaner-week-label";
-    label.textContent = compactLabel;
-    weekDates.appendChild(label);
+    if (hasOriginalDateLabel) {
+      const label = document.createElement("span");
+      label.className = "portal-cleaner-week-label";
+      label.textContent = compactLabel;
+      weekDates.appendChild(label);
+    }
 
     if (row.classList.contains("current")) {
       const currentMarker = document.createElement("span");
@@ -208,6 +242,11 @@ function getFileFormat(item, linkText) {
   const hiddenText = item.querySelector(".accesshide")?.textContent ?? "";
   const iconSource = item.querySelector(".activityicon")?.getAttribute("src") ?? "";
   const sourceText = `${hiddenText} ${iconSource} ${linkText}`.toLowerCase();
+
+  if (sourceText.includes("powerpoint")) {
+    return "PPT";
+  }
+
   const formats = ["pdf", "docx", "pptx", "ppt", "xlsx", "xls", "zip", "web"];
 
   for (const format of formats) {
@@ -225,6 +264,11 @@ function getFileFormat(item, linkText) {
 
 function getFormatFromSourceText(sourceText) {
   const normalizedSource = sourceText.toLowerCase();
+
+  if (normalizedSource.includes("powerpoint")) {
+    return "PPT";
+  }
+
   const formats = ["pdf", "docx", "pptx", "ppt", "xlsx", "xls", "zip", "mp4", "mp3", "web"];
 
   for (const format of formats) {
@@ -242,6 +286,27 @@ function getFormatFromSourceText(sourceText) {
   }
 
   return "Link";
+}
+
+function getFileIconSource(fileFormat) {
+  const normalizedFormat = String(fileFormat ?? "").toLowerCase();
+  const iconFormats = {
+    pdf: "pdf",
+    doc: "doc",
+    docx: "docx",
+    ppt: "powerpoint",
+    pptx: "powerpoint",
+    xls: "xls",
+    xlsx: "xlsx",
+    zip: "zip"
+  };
+  const iconFormat = iconFormats[normalizedFormat];
+
+  if (!iconFormat) {
+    return "";
+  }
+
+  return `https://ewble-sl.utar.edu.my/pix/f/${iconFormat}.gif`;
 }
 
 function resolveSummaryLinkCategory(label, href, fileFormat) {
@@ -286,6 +351,8 @@ function getCategoryPresentation(type) {
 }
 
 function buildFileCardContent(options) {
+  // Shared by real activity rows and summary-link pseudo activities so both
+  // surfaces expose the same format/category labels to students and discovery.
   const content = document.createElement("span");
   content.className = "portal-cleaner-file-card-content";
 
@@ -457,6 +524,9 @@ function enhanceWeeklyActivities() {
       const cleanedName = cleanFileName(originalName) || originalName;
       const fileFormat = getFileFormat(item, originalName);
 
+      // Store normalized metadata on the original Moodle activity item. The
+      // download/conversion panel performs separate discovery, but these
+      // attributes keep the visible weekly cards aligned with that same model.
       item.dataset.portalCleanerFileType = category.type;
       item.dataset.portalCleanerCardEnhanced = "true";
       item.dataset.portalCleanerWeek = weekNumber ? String(weekNumber) : "0";
@@ -565,20 +635,13 @@ function groupWeeklyFilesByCategory() {
 }
 
 function extractSummaryLinkLabel(link) {
-  const rowText = (link.parentElement?.textContent ?? link.textContent ?? "")
-    .replace(/\s+/g, " ")
-    .trim();
   const linkText = (link.textContent ?? "").replace(/\s+/g, " ").trim();
 
-  if (rowText) {
-    const trimmedRowText = rowText.replace(linkText, "").replace(/[:\-]\s*$/, "").trim();
-
-    if (trimmedRowText) {
-      return trimmedRowText;
-    }
+  if (linkText) {
+    return linkText;
   }
 
-  return linkText || "Open link";
+  return link.getAttribute("title")?.replace(/\s+/g, " ").trim() || "Open link";
 }
 
 function extractSummaryAnnouncementText(summary) {
@@ -592,6 +655,9 @@ function extractSummaryAnnouncementText(summary) {
 }
 
 function enhanceWeeklySummaries() {
+  // Summary links can contain downloadable files that are not normal Moodle
+  // activity rows. Promote them into the same card grid so the course page and
+  // bulk tools do not visually disagree.
   const rows = getWeeklyOutlineRows();
 
   rows.forEach((row) => {
@@ -636,6 +702,17 @@ function enhanceWeeklySummaries() {
 
         card.className = "portal-cleaner-file-card portal-cleaner-summary-link-card";
         card.href = link.href;
+
+        const iconSource = getFileIconSource(fileFormat);
+
+        if (iconSource) {
+          const icon = document.createElement("img");
+          icon.src = iconSource;
+          icon.className = "activityicon";
+          icon.alt = "";
+          card.appendChild(icon);
+        }
+
         card.appendChild(buildFileCardContent({
           category,
           fileFormat,
@@ -644,7 +721,6 @@ function enhanceWeeklySummaries() {
         }));
 
         link.dataset.portalCleanerSummaryLinkEnhanced = "true";
-        link.classList.add("portal-cleaner-original-content");
         item.appendChild(card);
         activityList.appendChild(item);
       });
