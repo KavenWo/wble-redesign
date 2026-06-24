@@ -24,7 +24,8 @@ function isPlaceholderLinkTitle(name) {
   const normalizedName = normalizeResourceText(name).toLowerCase();
 
   return /^https?:\/\/(www\.)?moodle\.org\/[\d.]+$/iu.test(normalizedName) ||
-    /^https?:\/\/[^/\s]+\/[\d.]+$/iu.test(normalizedName);
+    /^https?:\/\/[^/\s]+\/[\d.]+$/iu.test(normalizedName) ||
+    /^(?:open link|click here|here|link|download|file)$/iu.test(normalizedName);
 }
 
 function titleCaseFileName(name) {
@@ -223,12 +224,6 @@ function buildResourceRecord(item, link, source) {
   // Moodle hides format labels in .accesshide, and our weekly enhancer adds
   // richer card markup later. Clone and strip those nodes so titles stay like
   // "Topic 4b slides" instead of "Topic 4b slides Powerpoint presentationPPT".
-  const rawTitle = getCleanLinkTitle(link);
-
-  if (!rawTitle) {
-    return null;
-  }
-
   let url;
 
   try {
@@ -237,6 +232,7 @@ function buildResourceRecord(item, link, source) {
     return null;
   }
 
+  const rawTitle = getCleanLinkTitle(link);
   const hrefTitle = getFileNameFromHref(url);
   const cleanedTitle = cleanDiscoveredFileName(rawTitle);
   const title = isPlaceholderLinkTitle(rawTitle) ? hrefTitle : cleanedTitle || hrefTitle || rawTitle;
@@ -296,13 +292,14 @@ function discoverSummaryResources() {
   return resources;
 }
 
-// The page can expose the same resource through both the weekly card and the
-// summary area. Dedupe by URL and title so one file only enters the ZIP once.
+// The page can expose the same resource through both the summary area and the
+// generated UI. Dedupe by canonical URL so one file only enters the ZIP once
+// even when the two surfaces disagree about a title.
 function dedupeResources(resources) {
   const seen = new Set();
 
   return resources.filter((resource) => {
-    const key = `${resource.href}::${resource.title}`;
+    const key = resource.href;
 
     if (seen.has(key)) {
       return false;

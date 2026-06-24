@@ -6,7 +6,12 @@
    ========================================================================== */
 
 html.portal-cleaner-active #middle-column .weeks,
-html.portal-cleaner-active #center-column .weeks {
+html.portal-cleaner-active #center-column .weeks,
+/* Some Moodle courses use a topic outline instead of dated weekly rows. Those
+   pages do not provide .weekdates, so weekly.js creates W1/W2-only headers and
+   this table needs the same card spacing as normal date-based weekly outlines. */
+html.portal-cleaner-active #middle-column .topics,
+html.portal-cleaner-active #center-column .topics {
   width: 100% !important;
   max-width: 100% !important;
   border-collapse: separate !important;
@@ -131,10 +136,6 @@ html.portal-cleaner-active tr.section.main[id^="section-"] .summary td div,
 html.portal-cleaner-active tr.section.main[id^="section-"] .summary td span {
   font-size: inherit !important;
   line-height: 1.4 !important;
-}
-
-html.portal-cleaner-active tr.section.main[id^="section-"] .summary a:not(.portal-cleaner-summary-link-card) {
-  display: none !important;
 }
 
 html.portal-cleaner-active .portal-cleaner-summary-card-text {
@@ -468,4 +469,3 @@ html.portal-cleaner-active tr.section.main[data-portal-cleaner-relative="current
   padding-left: calc(0.8rem - 3px) !important;
   box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08) !important;
 }
-

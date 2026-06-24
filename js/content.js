@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Content Module
    ==========================================================================
    Boots the page-side redesign experience on WBLE. It manages root state,
@@ -657,7 +657,7 @@ function rebuildHeader() {
   logoLink.href = "https://ewble-sl.utar.edu.my/";
   logoLink.className = "portal-cleaner-header-logo";
   const logoImg = document.createElement("img");
-  logoImg.src = "https://upload.wikimedia.org/wikipedia/commons/b/b0/UTAR_LOGO_30122025.png";
+  logoImg.src = chrome.runtime.getURL("utar-logo.png");
   logoImg.alt = "UTAR Logo";
   logoLink.appendChild(logoImg);
   container.appendChild(logoLink);
@@ -809,3 +809,4 @@ window.PortalCleanerApp = {
     registerDomReadyHook();
   }
 };
+

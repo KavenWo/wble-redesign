@@ -1,57 +1,68 @@
-{
-  "manifest_version": 3,
-  "name": "UTAR WBLE Cleaner",
-  "version": "0.1.0",
-  "description": "Light UI cleanup for the UTAR WBLE portal.",
-  "permissions": ["storage", "tabs", "downloads", "identity"],
-  "host_permissions": [
-    "https://ewble-sl.utar.edu.my/*",
-    "https://graph.microsoft.com/*",
-    "https://login.microsoftonline.com/*"
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["campus-image.jpg"],
-      "matches": ["https://ewble-sl.utar.edu.my/*"]
-    }
-  ],
-  "content_scripts": [
-    {
-      "matches": ["https://ewble-sl.utar.edu.my/*"],
-      "css": [
-        "css/variables.css",
-        "css/layout.css",
-        "css/header.css",
-        "css/navigation.css",
-        "css/directory.css",
-        "css/courses.css",
-        "css/calendar.css",
-        "css/upcoming-events.css",
-        "css/recent-activity.css",
-        "css/menu.css",
-        "css/news.css",
-        "css/login.css",
-        "css/weekly.css",
-        "css/file-tools.css"
-      ],
-      "js": [
-        "js/resource-discovery.js",
-        "js/zip-builder.js",
-        "js/onedrive-auth.js",
-        "js/onedrive-converter.js",
-        "js/file-tools.js",
-        "js/weekly.js",
-        "js/content.js",
-        "js/controller.js"
-      ],
-      "run_at": "document_start"
-    }
-  ],
-  "background": {
-    "service_worker": "js/background.js"
-  },
-  "action": {
-    "default_popup": "popup.html",
-    "default_title": "UTAR WBLE Cleaner"
-  }
+﻿{
+    "manifest_version":  3,
+    "name":  "WBLE Glow-Up",
+    "version":  "0.1.0",
+    "description":  "Turns UTAR WBLE from a 2/10 to a 10/10",
+    "permissions":  [
+                        "storage",
+                        "tabs",
+                        "identity"
+                    ],
+    "host_permissions":  [
+                             "https://ewble-sl.utar.edu.my/*",
+                             "https://graph.microsoft.com/*",
+                             "https://login.microsoftonline.com/*"
+                         ],
+    "web_accessible_resources":  [
+                                     {
+                                         "resources":  [
+                                                           "campus-image.jpg",
+                                                           "utar-logo.png"
+                                                       ],
+                                         "matches":  [
+                                                         "https://ewble-sl.utar.edu.my/*"
+                                                     ]
+                                     }
+                                 ],
+    "content_scripts":  [
+                            {
+                                "matches":  [
+                                                "https://ewble-sl.utar.edu.my/*"
+                                            ],
+                                "css":  [
+                                            "css/variables.css",
+                                            "css/layout.css",
+                                            "css/header.css",
+                                            "css/navigation.css",
+                                            "css/directory.css",
+                                            "css/courses.css",
+                                            "css/calendar.css",
+                                            "css/upcoming-events.css",
+                                            "css/recent-activity.css",
+                                            "css/menu.css",
+                                            "css/news.css",
+                                            "css/login.css",
+                                            "css/weekly.css",
+                                            "css/file-tools.css"
+                                        ],
+                                "js":  [
+                                           "js/resource-discovery.js",
+                                           "js/zip-builder.js",
+                                           "js/onedrive-auth.js",
+                                           "js/onedrive-converter.js",
+                                           "js/file-tools.js",
+                                           "js/weekly.js",
+                                           "js/content.js",
+                                           "js/controller.js"
+                                       ],
+                                "run_at":  "document_start"
+                            }
+                        ],
+    "background":  {
+                       "service_worker":  "js/background.js"
+                   },
+    "action":  {
+                   "default_popup":  "popup.html",
+                   "default_title":  "UTAR WBLE Cleaner"
+               }
 }
